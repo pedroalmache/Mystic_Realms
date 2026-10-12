@@ -1,0 +1,225 @@
+:host {
+  display: flex;
+  height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 0%, #1a0a2e 0%, #0a0012 70%);
+}
+
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem;
+}
+
+.login-card {
+  background: rgba(255 255 255 / 0.04);
+  border: 1px solid rgba(180 120 255 / 0.25);
+  border-radius: 1.5rem;
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 0 60px rgba(140 70 255 / 0.15);
+}
+
+/* Dragon logo */
+.logo-area {
+  margin-bottom: 0.5rem;
+}
+
+.logo-dragon {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(180 126 255 / 0.6));
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(180 126 255 / 0.6)); }
+  50%       { filter: drop-shadow(0 0 24px rgba(180 126 255 / 1)); }
+}
+
+/* Text */
+.title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: linear-gradient(90deg, #c89cff 0%, #7b4fff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  margin: 0;
+  color: rgba(200 180 255 / 0.6);
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+/* Mode tabs */
+.mode-tabs {
+  display: flex;
+  width: 100%;
+  gap: 0.5rem;
+  background: rgba(255 255 255 / 0.04);
+  border: 1px solid rgba(180 120 255 / 0.2);
+  border-radius: 0.75rem;
+  padding: 0.3rem;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: rgba(200 180 255 / 0.5);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &.active {
+    background: linear-gradient(135deg, #7b4fff 0%, #4a00c8 100%);
+    color: #fff;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &:not(.active):not(:disabled):hover {
+    color: rgba(200 180 255 / 0.85);
+  }
+}
+
+/* Error */
+.error-message {
+  margin: 0;
+  padding: 0.6rem 1rem;
+  background: rgba(255 60 60 / 0.12);
+  border: 1px solid rgba(255 80 80 / 0.3);
+  border-radius: 0.5rem;
+  color: #ff8a8a;
+  font-size: 0.875rem;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(200 180 255 / 0.75);
+  letter-spacing: 0.04em;
+}
+
+.field-input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(180 120 255 / 0.3);
+  border-radius: 0.6rem;
+  background: rgba(255 255 255 / 0.05);
+  color: rgba(230 210 255 / 0.95);
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &::placeholder {
+    color: rgba(200 180 255 / 0.3);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: rgba(180 120 255 / 0.65);
+    box-shadow: 0 0 0 3px rgba(123 79 255 / 0.15);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Submit button */
+.submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #7b4fff 0%, #4a00c8 100%);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    box-shadow 0.2s,
+    transform 0.1s;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+    box-shadow: 0 4px 24px rgba(123 79 255 / 0.5);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255 255 255 / 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Legal text */
+.legal {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(200 180 255 / 0.35);
+  text-align: center;
+}

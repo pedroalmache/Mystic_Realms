@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+/* Full-viewport background wrapper */
+.game-viewport {
+  position: fixed;
+  inset: 0;
+  background-color: #0a0012;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Locked 1600×900 game frame */
+.game-frame {
+  width: 1600px;
+  height: 900px;
+  overflow: hidden;
+  position: relative;
+}

@@ -1,0 +1,15 @@
+<div class="game-content" [class.game-content--transitioning]="isRoomSwitching()">
+  @if (isRoomRewards()) {
+    <app-room-rewards
+      [gameId]="game()?.gameId ?? null"
+      [actionLog]="actionLog()"
+      (rewardConfirmed)="onRewardConfirmed()"
+    />
+  } @else if (isEncounter()) {
+    <app-encounter [actionLog]="actionLog()" [gameId]="game()?.gameId ?? null" [isMyTurn]="isEncounter()" (endTurn)="onEndTurn()" (actionsReceived)="onActionsReceived($event)" (roomWon)="onRoomWon()" />
+  } @else if (isRoomSelection()) {
+    <app-room-selection [gameId]="game()?.gameId ?? null" (roomSelected)="onRoomSelected($event)" />
+  } @else {
+    <router-outlet />
+  }
+</div>

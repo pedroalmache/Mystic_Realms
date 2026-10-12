@@ -1,0 +1,51 @@
+<div class="home-wrapper" [style.backgroundImage]="'url(' + background + ')'">
+  <div class="home-container">
+    <ng-container *ngIf="activeGame()?.code">
+      <div class="game-code-badge" [style.backgroundImage]="'url(' + topTitleBg + ')'">
+        <span class="game-code-text">{{ activeGame()!.code }}</span>
+        <button class="copy-code-btn" type="button" (click)="copyCode()" title="Copy code">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </ng-container>
+
+    <div class="panels">
+      <!-- Single Player Panel -->
+      <div class="panel panel-single">
+        <span class="panel-label">Single Player</span>
+        <div class="panel-main">
+          <img class="panel-icon" [src]="singlePlayerIcon" alt="Single Player" />
+          <div *ngIf="isLoading()" class="loading-spinner" aria-label="Loading…"></div>
+          <ng-container *ngIf="!isLoading()">
+            <ng-container *ngIf="!activeGame(); else hasGame">
+              <button class="game-btn" (click)="onNewGame()" type="button" [style.backgroundImage]="'url(' + greenButton + ')'">
+                NEW GAME
+              </button>
+            </ng-container>
+            <ng-template #hasGame>
+              <button class="game-btn" type="button" (click)="onContinue()" [style.backgroundImage]="'url(' + greenButton + ')'">
+                CONTINUE
+              </button>
+              <a class="new-game-link" (click)="onNewGame()" role="button" tabindex="0"
+                 (keydown.enter)="onNewGame()"
+                 (keydown.space)="onNewGame(); $event.preventDefault()">
+                New Game
+              </a>
+            </ng-template>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Multi Player Panel -->
+      <div class="panel panel-multi">
+        <span class="panel-label">Multiplayer</span>
+        <img class="panel-icon" [src]="multiPlayerIcon" alt="Multi Player" />
+        <span class="coming-soon">COMING SOON</span>
+      </div>
+    </div>
+  </div>
+</div>

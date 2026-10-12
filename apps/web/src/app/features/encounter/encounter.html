@@ -1,0 +1,474 @@
+<div
+  class="encounter-wrapper"
+  [style.backgroundImage]="'url(' + background() + ')'"
+  [style.--game-over-fade-ms]="gameOverFadeDuration"
+  [style.--game-over-text-fade-ms]="gameOverTextFadeDuration"
+  [style.--game-over-button-fade-ms]="gameOverButtonFadeDuration"
+  [style.--room-won-fade-ms]="roomWonFadeDuration"
+  [style.--room-won-text-fade-ms]="roomWonTextFadeDuration"
+>
+  <div class="turn-indicator">
+    <img [src]="Assets.Images.UI.LabelFlagSingleBlue" alt="Turn flag" class="turn-flag" />
+    <div class="turn-content">
+      <span class="turn-label">TURN</span>
+      <span class="turn-number" [class.turn-number--animating]="turnAnimating()">{{
+        displayTurn()
+      }}</span>
+    </div>
+  </div>
+
+  <div class="board-column">
+    @for (boardItem of displayBoard(); track boardItem.card.instanceId) {
+      <div
+        class="board-card"
+        (mouseenter)="onCardHover(boardItem.card)"
+        (mouseleave)="onCardLeave()"
+      >
+        <img
+          [src]="getBoardCardImage(boardItem.card)"
+          [alt]="boardItem.card.name"
+          class="board-card-img"
+        />
+      </div>
+    }
+  </div>
+
+  @if (hoveredTooltipCard(); as card) {
+    <div class="board-tooltip">
+      <app-card-tooltip [card]="card" />
+    </div>
+  }
+
+  @if (initiativeEntries().length > 0) {
+    <div class="initiative-bar">
+      @for (item of initiativeEntries(); track item.key) {
+        <div
+          class="initiative-entry"
+          [class.active]="$first && item.animationState !== 'leaving'"
+          [class.entering]="item.animationState === 'entering'"
+          [class.leaving]="item.animationState === 'leaving'"
+        >
+          <div class="initiative-portrait-wrapper">
+            <img
+              class="initiative-portrait"
+              [src]="initiativePortrait(item.entry)"
+              [alt]="item.entry.name ?? 'Unknown'"
+            />
+            <div class="initiative-speed">
+              <span class="speed-value">{{ item.entry.speed }}</span>
+              <img [src]="Assets.Images.Icons.Speed" alt="Speed" class="speed-icon" />
+            </div>
+          </div>
+          <span class="initiative-name">{{ item.entry.name }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Mana indicator – bottom left -->
+  <div class="mana-indicator" [class.not-enough-mana]="manaAttentionActive()">
+    <img [src]="Assets.Images.Icons.Mana" alt="Mana" class="mana-icon" />
+    <span class="mana-value">{{ displayedMana() }}</span>
+  </div>
+
+  <!-- Draw pile – bottom left, above mana indicator -->
+  <div class="draw-pile" [class.pulsing]="drawPilePulsing()" (click)="onDrawPileClick()">
+    <img [src]="Assets.Images.UI.DrawPile" alt="Draw pile" class="pile-img" />
+  </div>
+
+  <!-- Discard pile – bottom right, above End Turn button -->
+  <div
+    class="discard-pile"
+    #discardPile
+    [class.pulsing]="discardPilePulsing()"
+    (click)="onDiscardPileClick()"
+  >
+    <img [src]="Assets.Images.UI.DiscardPile" alt="Discard pile" class="pile-img" />
+  </div>
+
+  <button
+    class="end-turn-btn"
+    [disabled]="gameOverActive() || roomWonActive()"
+    (click)="endTurn.emit()"
+  >
+    <img [src]="Assets.Images.UI.GreenButton" alt="End Turn" class="end-turn-img" />
+    <span class="end-turn-label">END TURN</span>
+  </button>
+
+  <div class="combatants">
+    <div class="party-side">
+      @for (i of slotIndices; track i) {
+        <div class="character-slot">
+          @let member = displayPartyMembers()[i];
+          @if (member) {
+            <app-game-character
+              [spriteUrl]="partyMemberIdleSprite(member)"
+              [altText]="'Party member ' + member.partyMemberId"
+              [currentHp]="member.health"
+              [maxHp]="member.maxHealth"
+              [armor]="member.armor"
+              [magicArmor]="member.magicArmor ?? 0"
+              [armorDelta]="partyMemberArmorDelta(member)"
+              [armorAnimationKey]="partyMemberArmorAnimationKey(member)"
+              [armorType]="partyMemberArmorType(member)"
+              [strength]="member.strength"
+              [defense]="member.defense"
+              [strengthDelta]="partyMemberStrengthDelta(member)"
+              [strengthAnimationKey]="partyMemberStrengthAnimationKey(member)"
+              [defenseDelta]="partyMemberDefenseDelta(member)"
+              [defenseAnimationKey]="partyMemberDefenseAnimationKey(member)"
+              [speed]="member.speed"
+              [speedDelta]="partyMemberSpeedDelta(member)"
+              [speedAnimationKey]="partyMemberSpeedAnimationKey(member)"
+              [attackingSprite]="partyMemberAttackingSprite(member)"
+              [attackAnimationKey]="partyMemberAttackAnimationKey(member)"
+              [defendingSprite]="partyMemberDefendingSprite(member)"
+              [defendAnimationKey]="partyMemberDefendAnimationKey(member)"
+              [hpDelta]="partyMemberResourceDelta(member)"
+              [hpDeltaTone]="partyMemberResourceDeltaTone(member)"
+              [healingSprite]="partyMemberHealSprite(member)"
+              [healAnimationKey]="partyMemberHealAnimationKey(member)"
+              [poison]="member.poison ?? 0"
+              [poisonSprite]="Assets.Animations.Poison"
+              [poisonAnimationKey]="partyMemberPoisonAnimationKey(member)"
+              [poisonDelta]="partyMemberPoisonDelta(member)"
+              [className]="partyMemberClassName(member)"
+              [nameColor]="member.color"
+              [isSelectable]="isPartyMemberSelectable(member)"
+              [isSelected]="selectedPartyMemberIdentifiers().has(member.identifier)"
+              [selectedColor]="member.color"
+              [momentum]="member.momentum ?? 0"
+              [daggers]="member.daggers ?? 0"
+              [daggersAnimationKey]="partyMemberDaggersAnimationKey(member)"
+              [spirit]="member.spirit ?? 0"
+              [spiritAnimationKey]="partyMemberSpiritAnimationKey(member)"
+              [elementAnimationKey]="partyMemberElementAnimationKey(member)"
+              [fire]="member.fire ?? false"
+              [water]="member.water ?? false"
+              [earth]="member.earth ?? false"
+              [air]="member.air ?? false"
+              (characterClicked)="onPartyMemberClick(member)"
+            />
+          }
+        </div>
+      }
+    </div>
+    <div class="enemy-side">
+      @for (i of slotIndices; track i) {
+        <div class="character-slot">
+          @let enemy = displayEnemies()[i];
+          @if (enemy) {
+            <app-game-character
+              [spriteUrl]="enemyIdleSprite(enemy)"
+              [altText]="enemy.name ?? 'Enemy ' + enemy.id"
+              [currentHp]="enemy.hitPoints"
+              [maxHp]="enemy.maxHitPoints"
+              [armor]="enemy.armor"
+              [armorDelta]="enemyArmorDelta(enemy)"
+              [armorAnimationKey]="enemyArmorAnimationKey(enemy)"
+              [strength]="enemy.strength"
+              [strengthDelta]="enemyStrengthDelta(enemy)"
+              [strengthAnimationKey]="enemyStrengthAnimationKey(enemy)"
+              [defenseDelta]="enemyDefenseDelta(enemy)"
+              [defenseAnimationKey]="enemyDefenseAnimationKey(enemy)"
+              [speed]="enemy.speed"
+              [speedDelta]="enemySpeedDelta(enemy)"
+              [speedAnimationKey]="enemySpeedAnimationKey(enemy)"
+              [attackingSprite]="enemyAttackingSprite(enemy)"
+              [attackAnimationKey]="enemyAttackAnimationKey(enemy)"
+              [defendingSprite]="enemyDefendingSprite(enemy)"
+              [defendAnimationKey]="enemyDefendAnimationKey(enemy)"
+              [hpDelta]="enemyHpDelta(enemy)"
+              [hpDeltaTone]="enemyHpDeltaTone(enemy)"
+              [healingSprite]="enemyHealingSprite()"
+              [healAnimationKey]="enemyHealingAnimationKey(enemy)"
+              [poison]="enemy.poison ?? 0"
+              [poisonSprite]="Assets.Animations.Poison"
+              [poisonAnimationKey]="enemyPoisonAnimationKey(enemy)"
+              [poisonDelta]="enemyPoisonDelta(enemy)"
+              [daggers]="enemy.daggers ?? 0"
+              [daggersAnimationKey]="enemyDaggersAnimationKey(enemy)"
+              [isSelectable]="isEnemySelectable(enemy)"
+              [isSelected]="selectedEnemyInstanceIdSet().has(enemy.instanceId)"
+              (characterClicked)="onEnemyClick(enemy)"
+            />
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div
+    class="center-drop-zone"
+    #centerDropZone
+    [class.visible]="isAnyCardDragging()"
+    [class.has-card]="pinnedCard() !== null"
+    [class.selecting]="pendingCardPlay() !== null"
+  >
+    @if (pinnedCard(); as card) {
+      <div
+        class="pinned-card-wrapper"
+        style="pointer-events: auto"
+        (mouseenter)="onCardHover(card)"
+        (mouseleave)="onCardLeave()"
+      >
+        <app-card-display
+          [cardId]="card.cardId"
+          [borderColor]="card.color ?? 'black'"
+          [characterId]="card.classId"
+          [name]="card.name ?? ''"
+          [description]="card.description ?? ''"
+          [manaCost]="card.manaCost"
+          [attack]="card.attack"
+          [armor]="card.armor"
+          [magicAttack]="card.magicAttack"
+          [magicArmor]="card.magicArmor"
+          [defense]="card.defense"
+          [mana]="card.mana"
+          [healing]="card.heal"
+          [poison]="card.poison"
+          [draw]="card.draw"
+          [strength]="card.strength"
+          [effectMultiplier]="card.effectMultiplier"
+          [rarity]="card.rarity"
+          [permanent]="card.permanent"
+          [momentum]="card.momentum"
+          [daggers]="card.daggers"
+          [spirit]="card.spirit"
+          [fire]="card.fire ?? false"
+          [water]="card.water ?? false"
+          [earth]="card.earth ?? false"
+          [air]="card.air ?? false"
+        />
+      </div>
+      @if (pendingCardPlay() !== null) {
+        @if (targetSelectionHint(); as hint) {
+          <span class="pinned-card-hint">{{ hint }}</span>
+        }
+        <button class="pinned-cancel-btn" (click)="cancelTargetSelection()">Cancel</button>
+      }
+    } @else {
+      <span class="center-drop-zone-label">Play Card</span>
+    }
+  </div>
+
+  @if (displayHand().length > 0) {
+    <div class="card-hand">
+      @for (card of displayHand(); track card.instanceId; let i = $index) {
+        @if (pinnedCardSlotId() !== card.partyMemberId + '-' + i) {
+          <app-card
+            [id]="card.partyMemberId + '-' + i"
+            [cardId]="card.cardId"
+            [characterId]="card.classId"
+            [borderColor]="card.color ?? 'black'"
+            [name]="card.name ?? ''"
+            [description]="card.description ?? ''"
+            [manaCost]="card.manaCost"
+            [attack]="card.attack"
+            [armor]="card.armor"
+            [magicAttack]="card.magicAttack"
+            [magicArmor]="card.magicArmor"
+            [defense]="card.defense"
+            [mana]="card.mana"
+            [healing]="card.heal"
+            [poison]="card.poison"
+            [draw]="card.draw"
+            [strength]="card.strength"
+            [effectMultiplier]="card.effectMultiplier"
+            [rarity]="card.rarity"
+            [permanent]="card.permanent"
+            [cardIndex]="i"
+            [totalCards]="displayHand().length"
+            [isMyTurn]="canPlayCards()"
+            [playerEnergy]="activePlayerMana()"
+            [isEntering]="enteringCardInstanceIds().has(card.instanceId)"
+            [isLeaving]="leavingCardInstanceIds().has(card.instanceId)"
+            [isDiscardHandLeaving]="discardHandLeavingCardInstanceIds().has(card.instanceId)"
+            [discardPileElement]="discardPileEl()?.nativeElement ?? null"
+            [centerZoneElement]="centerDropZoneEl()?.nativeElement ?? null"
+            [cardPlayed]="onCardPlayed"
+            (dragStarted)="onCardDragStarted()"
+            (dragEnded)="onCardDragEnded()"
+            (cardPinned)="onCardPinned(card.partyMemberId + '-' + i, card)"
+            (mouseenter)="onCardHover(card)"
+            (mouseleave)="onCardLeave()"
+            [momentum]="card.momentum"
+            [daggers]="card.daggers"
+            [spirit]="card.spirit"
+            [fire]="card.fire ?? false"
+            [water]="card.water ?? false"
+            [earth]="card.earth ?? false"
+            [air]="card.air ?? false"
+          />
+        }
+      }
+    </div>
+  }
+
+  <!-- Selected ally portraits – left side -->
+  @if (selectedPartyPortraits().length > 0) {
+    <div class="selected-targets selected-targets--allies">
+      @for (target of selectedPartyPortraits(); track $index) {
+        <div
+          class="selected-target-portrait"
+          [style.--selected-target-border-color]="target.borderColor"
+        >
+          <img [src]="target.portraitUrl" alt="Selected ally" />
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Selected enemy portraits – right side -->
+  @if (selectedEnemyPortraits().length > 0) {
+    <div class="selected-targets selected-targets--enemies">
+      @for (target of selectedEnemyPortraits(); track $index) {
+        <div
+          class="selected-target-portrait"
+          [style.--selected-target-border-color]="target.borderColor"
+        >
+          <img [src]="target.portraitUrl" alt="Selected enemy" />
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Draw pile panel – left half overlay -->
+  @if (activePile() === 'draw') {
+    <div class="pile-panel pile-panel--left">
+      <div class="pile-panel__header">
+        <span class="pile-panel__title">Draw Pile</span>
+        <button
+          class="pile-panel__close"
+          (click)="activePile.set(null)"
+          aria-label="Close draw pile"
+        >
+          ✕
+        </button>
+      </div>
+      <div class="pile-panel__cards">
+        @for (card of drawPileCards(); track $index) {
+          <div
+            class="pile-card-wrapper"
+            (mouseenter)="onCardHover(card)"
+            (mouseleave)="onCardLeave()"
+          >
+            <app-card-display
+              [cardId]="card.cardId"
+              [borderColor]="card.color ?? 'black'"
+              [characterId]="card.classId"
+              [name]="card.name ?? ''"
+              [description]="card.description ?? ''"
+              [manaCost]="card.manaCost"
+              [attack]="card.attack"
+              [armor]="card.armor"
+              [magicAttack]="card.magicAttack"
+              [magicArmor]="card.magicArmor"
+              [defense]="card.defense"
+              [mana]="card.mana"
+              [healing]="card.heal"
+              [poison]="card.poison"
+              [draw]="card.draw"
+              [strength]="card.strength"
+              [effectMultiplier]="card.effectMultiplier"
+              [rarity]="card.rarity"
+              [permanent]="card.permanent"
+              [momentum]="card.momentum"
+              [daggers]="card.daggers"
+              [spirit]="card.spirit"
+              [fire]="card.fire ?? false"
+              [water]="card.water ?? false"
+              [earth]="card.earth ?? false"
+              [air]="card.air ?? false"
+            />
+          </div>
+        }
+        @if (drawPileCards().length === 0) {
+          <span class="pile-panel__empty">The draw pile is empty.</span>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Discard pile panel – right half overlay -->
+  @if (activePile() === 'discard') {
+    <div class="pile-panel pile-panel--right">
+      <div class="pile-panel__header">
+        <span class="pile-panel__title">Discard Pile</span>
+        <button
+          class="pile-panel__close"
+          (click)="activePile.set(null)"
+          aria-label="Close discard pile"
+        >
+          ✕
+        </button>
+      </div>
+      <div class="pile-panel__cards">
+        @for (card of discardPileCards(); track $index) {
+          <div
+            class="pile-card-wrapper"
+            (mouseenter)="onCardHover(card)"
+            (mouseleave)="onCardLeave()"
+          >
+            <app-card-display
+              [cardId]="card.cardId"
+              [borderColor]="card.color ?? 'black'"
+              [characterId]="card.classId"
+              [name]="card.name ?? ''"
+              [description]="card.description ?? ''"
+              [manaCost]="card.manaCost"
+              [attack]="card.attack"
+              [armor]="card.armor"
+              [magicAttack]="card.magicAttack"
+              [magicArmor]="card.magicArmor"
+              [defense]="card.defense"
+              [mana]="card.mana"
+              [healing]="card.heal"
+              [poison]="card.poison"
+              [draw]="card.draw"
+              [strength]="card.strength"
+              [effectMultiplier]="card.effectMultiplier"
+              [rarity]="card.rarity"
+              [permanent]="card.permanent"
+              [momentum]="card.momentum"
+              [daggers]="card.daggers"
+              [spirit]="card.spirit"
+              [fire]="card.fire ?? false"
+              [water]="card.water ?? false"
+              [earth]="card.earth ?? false"
+              [air]="card.air ?? false"
+            />
+          </div>
+        }
+        @if (discardPileCards().length === 0) {
+          <span class="pile-panel__empty">The discard pile is empty.</span>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="game-over-overlay" [class.game-over-overlay--active]="gameOverActive()">
+    <span
+      class="game-over-overlay__text"
+      [class.game-over-overlay__text--visible]="gameOverTextVisible()"
+    >
+      GAME OVER
+    </span>
+    <button
+      class="game-over-overlay__button"
+      [class.game-over-overlay__button--visible]="gameOverButtonVisible()"
+      (click)="navigateHome()"
+    >
+      RISE AGAIN
+    </button>
+  </div>
+
+  <div class="room-won-overlay" [class.room-won-overlay--active]="roomWonActive()">
+    <span
+      class="room-won-overlay__text"
+      [class.room-won-overlay__text--visible]="roomWonTextVisible()"
+    >
+      VICTORY
+    </span>
+  </div>
+</div>

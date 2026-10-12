@@ -1,0 +1,96 @@
+.card-tooltip {
+  width: 260px;
+  background: rgba(15, 5, 25, 0.95);
+  border: 2px solid #ffd700;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(255, 215, 0, 0.3);
+  pointer-events: none;
+  animation: tooltip-fade-in 0.2s ease-out;
+
+  .tooltip-header {
+    border-bottom: 1px solid rgba(255, 215, 0, 0.4);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .tooltip-name {
+      font-family: 'Germania One', sans-serif;
+      font-size: 18px;
+      color: #ffd700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .permanent-icon {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+    }
+  }
+
+  .tooltip-description {
+    font-family: 'Ropa Sans', sans-serif;
+    font-size: 20px;
+    color: #eee;
+    line-height: 1.4;
+    text-align: center;
+
+    .tooltip-icon {
+      height: 22px;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+  }
+
+  .tooltip-legend {
+    border-top: 1px dashed rgba(255, 215, 0, 0.4);
+    margin-top: 12px;
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .legend-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .legend-icon {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .legend-text {
+      font-family: 'Ropa Sans', sans-serif;
+      font-size: 14px;
+      color: #ddd;
+      line-height: 1.3;
+
+      strong {
+        color: #ffd700;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+@keyframes tooltip-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

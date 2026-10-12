@@ -1,0 +1,101 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="logo-area">
+      <img [src]="logoDragon" alt="Mystic Realms" class="logo-dragon" />
+    </div>
+
+    <h1 class="title">Mystic Realms</h1>
+    <p class="subtitle">{{ isSignUp() ? 'Create your account&hellip;' : 'Enter the realm&hellip;' }}</p>
+
+    <div class="mode-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="!isSignUp()"
+        (click)="toggleMode()"
+        [disabled]="!isSignUp() || isLoading()"
+        type="button"
+      >
+        Sign In
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="isSignUp()"
+        (click)="toggleMode()"
+        [disabled]="isSignUp() || isLoading()"
+        type="button"
+      >
+        Sign Up
+      </button>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="error-message" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <form class="auth-form" (ngSubmit)="onSubmit()" #authForm="ngForm">
+      <div class="field-group">
+        <label for="email" class="field-label">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          class="field-input"
+          [(ngModel)]="email"
+          placeholder="you@example.com"
+          required
+          autocomplete="email"
+          [disabled]="isLoading()"
+        />
+      </div>
+
+      <div class="field-group">
+        <label for="password" class="field-label">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          class="field-input"
+          [(ngModel)]="password"
+          placeholder="••••••••"
+          required
+          autocomplete="{{ isSignUp() ? 'new-password' : 'current-password' }}"
+          [disabled]="isLoading()"
+        />
+      </div>
+
+      @if (isSignUp()) {
+        <div class="field-group">
+          <label for="gamerTag" class="field-label">Gamer Tag</label>
+          <input
+            id="gamerTag"
+            name="gamerTag"
+            type="text"
+            class="field-input"
+            [(ngModel)]="gamerTag"
+            placeholder="YourGamerTag"
+            required
+            autocomplete="username"
+            [disabled]="isLoading()"
+          />
+        </div>
+      }
+
+      <button
+        class="submit-btn"
+        [disabled]="isLoading() || authForm.invalid"
+        type="submit"
+      >
+        @if (isLoading()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>{{ isSignUp() ? 'Creating account&hellip;' : 'Signing in&hellip;' }}</span>
+        } @else {
+          <span>{{ isSignUp() ? 'Create Account' : 'Sign In' }}</span>
+        }
+      </button>
+    </form>
+
+    <p class="legal">
+      By signing in you agree to the realm&rsquo;s terms of service.
+    </p>
+  </div>
+</div>

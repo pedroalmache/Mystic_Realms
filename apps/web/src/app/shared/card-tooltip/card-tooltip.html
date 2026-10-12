@@ -1,0 +1,31 @@
+<div class="card-tooltip">
+  <div class="tooltip-header">
+    <span class="tooltip-name">{{ card().name }}</span>
+    @if (card().permanent) {
+      <img class="permanent-icon" [src]="Assets.Images.Cards.Display.Permanent" alt="" />
+    }
+  </div>
+  <div class="tooltip-description">
+    @for (part of parsedDescription(); track $index) {
+      @if (part.type === 'image') {
+        <img class="tooltip-icon" [src]="part.value" alt="" />
+      } @else if (part.type === 'newline') {
+        <br />
+      } @else {
+        <span>{{ part.value }}</span>
+      }
+    }
+  </div>
+  @if (legendItems().length > 0) {
+    <div class="tooltip-legend">
+      @for (item of legendItems(); track item.label) {
+        <div class="legend-row">
+          <img class="legend-icon" [src]="item.icon" alt="" />
+          <span class="legend-text"
+            ><strong>{{ item.label }}:</strong> {{ item.meaning }}</span
+          >
+        </div>
+      }
+    </div>
+  }
+</div>

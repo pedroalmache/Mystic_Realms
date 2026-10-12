@@ -1,0 +1,81 @@
+<div class="card-display-container">
+  <div class="color-border" [style.border-color]="borderColor()">
+    <div class="image-frame">
+      <div class="main-image-container">
+        <img class="main-image" [src]="picture()" [alt]="name()" />
+      </div>
+      <img class="frame" [src]="Assets.Images.Cards.Display.CardFrame" alt="" />
+    </div>
+
+    <div class="name">
+      {{name()}}
+    </div>
+
+    <div class="description">
+      <div
+        class="description-content"
+        [class.medium-description]="descriptionLineCount() === 3"
+        [class.long-description]="descriptionLineCount() > 3"
+      >
+        @for (part of parsedDescription(); track $index) {
+          @if (part.type === 'image') {
+            <img class="resized-icon" [src]="part.value" alt="" />
+          } @else if (part.type === 'newline') {
+            <br />
+          } @else {
+            <span>{{ part.value }}</span>
+          }
+        }
+      </div>
+    </div>
+  </div>
+  <div class="mana">{{ manaCost() }}</div>
+  @if (permanent()) {
+    <div class="permanent"><img [src]="Assets.Images.Cards.Display.Permanent" alt="" /></div>
+  }
+
+  @if (momentum() > 0) {
+    <div class="stat">
+      <img class="stat-icon" [src]="Assets.Images.Characters.Warrior.Powers.Momentum" alt="" />
+      <span class="stat-value">+{{ momentum() }}</span>
+    </div>
+  }
+
+  @if (daggers() != 0 && daggers() != null) {
+    <div class="stat">
+      <img class="stat-icon" [src]="Assets.Images.Characters.Assassin.Powers.Daggers" alt="" />
+      <span class="stat-value">{{ daggers() }}</span>
+    </div>
+  }
+
+  @if (spirit() !== Spirits.None && spirit() !== null) {
+    <div class="stat">
+      <img class="stat-icon" [src]="spiritIcon()" alt="" />
+    </div>
+  }
+
+  @if (fire()) {
+    <div class="stat">
+      <img class="stat-icon" [src]="Assets.Images.Characters.Elementalist.Powers.Fire" alt="" />
+    </div>
+  }
+
+  @if (water()) {
+    <div class="stat">
+      <img class="stat-icon" [src]="Assets.Images.Characters.Elementalist.Powers.Water" alt="" />
+    </div>
+  }
+
+  @if (earth()) {
+    <div class="stat">
+      <img class="stat-icon" [src]="Assets.Images.Characters.Elementalist.Powers.Earth" alt="" />
+    </div>
+  }
+
+  @if (air()) {
+    <div class="stat">
+      <img class="stat-icon" [src]="Assets.Images.Characters.Elementalist.Powers.Air" alt="" />
+    </div>
+  }
+  <div class="rarity" [style.background-image]="'url(' + rarityImage() + ')'"></div>
+</div>

@@ -1,0 +1,342 @@
+<div class="cs-wrapper" [style.backgroundImage]="'url(' + background + ')'">
+  <!-- Top-left title bar -->
+  <div class="top-left-text" [style.backgroundImage]="'url(' + topTitleBg + ')'">
+    Choose Your Characters
+  </div>
+
+  @if (!isLoading()) {
+    <!-- Gender selection (top-center) -->
+    <div class="gender-selection">
+      <div class="gender-button" (click)="selectGender('male')">
+        <div class="gender-icon-frame" [class.selected]="selectedGender() === 'male'">
+          <img [src]="maleIcon" alt="Male" />
+        </div>
+        <p>Male</p>
+      </div>
+      <div class="gender-button" (click)="selectGender('female')">
+        <div class="gender-icon-frame" [class.selected]="selectedGender() === 'female'">
+          <img [src]="femaleIcon" alt="Female" />
+        </div>
+        <p>Female</p>
+      </div>
+    </div>
+
+    <!-- Character class grid (left panel) -->
+    <div class="character-grid">
+      @for (cls of classes(); track cls.id; let i = $index) {
+        <div class="character-cell" (click)="selectCharacter(i)">
+          <div
+            class="character-frame"
+            [class.selected]="selectedIndex() === i"
+            [style.backgroundImage]="
+              'url(' + (selectedIndex() === i ? roleIconFrameFocus : roleIconFrame) + ')'
+            "
+          >
+            <img
+              [src]="'assets/images/characters/' + cls.name.toLowerCase() + '/role_icon.png'"
+              [alt]="cls.name"
+            />
+          </div>
+          <p>{{ cls.name }}</p>
+        </div>
+      }
+    </div>
+
+    <!-- Centre character preview -->
+    @if (selectedCharacter()) {
+      <div class="fixed-character">
+        <img [src]="characterImage()" [alt]="selectedCharacter().name" />
+      </div>
+    }
+
+    <!-- Right info panel -->
+    @if (selectedCharacter()) {
+      <div class="character-info">
+        <div class="info-header">
+          <div class="info-text">
+            <h3>{{ selectedCharacter().name }}</h3>
+            <img [src]="portraitImage()" [alt]="selectedCharacter().name" />
+          </div>
+          <button
+            class="deck-btn"
+            (click)="openDeckOverlay()"
+            type="button"
+            aria-label="View class cards"
+          >
+            <img [src]="deckIcon" alt="Deck" />
+          </button>
+        </div>
+
+        <p class="description">{{ selectedCharacter().description }}</p>
+
+        <div class="stats">
+          <!-- Hitpoints -->
+          <div class="stat hitpoints">
+            <img [src]="hpIcon" alt="HP" />
+            <span>HP</span>
+            <div class="stat-bar">
+              <div
+                class="stat-fill"
+                [style.width.%]="statPercent(selectedCharacter().hitPoints, 100)"
+              ></div>
+            </div>
+          </div>
+          <!-- Mana -->
+          <div class="stat mana">
+            <img [src]="manaIcon" alt="Mana" />
+            <span>Mana</span>
+            <div class="stat-bar">
+              <div
+                class="stat-fill"
+                [style.width.%]="statPercent(selectedCharacter().energy, 10)"
+              ></div>
+            </div>
+          </div>
+          <!-- Speed -->
+          <div class="stat speed">
+            <img [src]="speedIcon" alt="Speed" />
+            <span>Speed</span>
+            <div class="stat-bar">
+              <div
+                class="stat-fill"
+                [style.width.%]="statPercent(selectedCharacter().speed, 10)"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Select button -->
+        @if (selectedCharacter().isUnlocked) {
+          <button
+            class="confirm-btn"
+            [style.backgroundImage]="'url(' + greenButton + ')'"
+            (click)="onSelect()"
+            type="button"
+          >
+            SELECT
+          </button>
+        } @else {
+          <img class="lock_icon" [src]="lockIcon" />
+        }
+      </div>
+    }
+
+    <!-- Bottom-right: seed input + start button -->
+    @if (canStart()) {
+      <div class="bottom-right-controls">
+        <input
+          class="seed-input"
+          type="text"
+          placeholder="Seed (optional)"
+          [value]="gameSeed()"
+          (input)="updateSeed($any($event).target.value)"
+          aria-label="Game seed"
+        />
+        <button
+          class="confirm-btn start-btn"
+          [style.backgroundImage]="'url(' + greenButton + ')'"
+          (click)="onStart()"
+          [disabled]="isStarting()"
+          type="button"
+        >
+          {{ isStarting() ? 'STARTING…' : 'START' }}
+        </button>
+      </div>
+    }
+
+    <!-- Party slots bar (bottom) -->
+    <div class="party-slots-bar">
+      @for (slot of partySlots(); track $index; let i = $index) {
+        <div
+          class="party-slot"
+          [class.active]="activePartySlot() === i"
+          (click)="selectPartySlot(i)"
+        >
+          <div class="party-slot-frame-container">
+            <img class="party-slot-layer party-slot-bg" [src]="characterFrameBlueBg" alt="" />
+            <img
+              class="party-slot-layer party-slot-portrait"
+              [src]="getSlotPortrait(slot)"
+              [alt]="'Party slot ' + (i + 1)"
+            />
+            <div
+              class="party-slot-layer party-slot-frame-overlay"
+              [style.backgroundImage]="'url(' + characterFrame + ')'"
+            ></div>
+            @if (slot) {
+              <button
+                class="party-slot-remove"
+                (click)="removeMember(i, $event)"
+                type="button"
+                aria-label="Remove character"
+              >
+                <img [src]="closeIcon" alt="Remove" />
+              </button>
+            }
+          </div>
+
+          <div class="color-picker-wrapper">
+            <label
+              [for]="'color-' + i"
+              class="color-circle"
+              [style.backgroundColor]="slotColors()[i]"
+              [attr.aria-label]="'Select color for party slot ' + (i + 1)"
+              (click)="$event.stopPropagation()"
+            >
+            </label>
+            <input
+              [id]="'color-' + i"
+              type="color"
+              class="color-input"
+              [attr.aria-label]="'Color picker for party slot ' + (i + 1)"
+              [value]="slotColors()[i]"
+              (change)="updateSlotColor(i, $any($event).target.value)"
+              (click)="$event.stopPropagation()"
+            />
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    @if (!hasError()) {
+      <div class="loading">Loading characters…</div>
+    } @else {
+      <div class="loading">Failed to load characters. Please try again.</div>
+    }
+  }
+
+  <!-- Deck Overlay -->
+  @if (isDeckOverlayOpen()) {
+    <div class="deck-overlay" (click)="closeDeckOverlay()">
+      <div class="deck-panel" (click)="$event.stopPropagation()">
+        <div class="deck-overlay__bg-portraits">
+          <img
+            class="deck-overlay__portrait deck-overlay__portrait--male"
+            [src]="malePortrait()"
+            alt=""
+          />
+          <img
+            class="deck-overlay__portrait deck-overlay__portrait--female"
+            [src]="femalePortrait()"
+            alt=""
+          />
+        </div>
+        <div class="deck-panel__header">
+          <h3 class="deck-panel__title">{{ selectedCharacter().name }} Cards</h3>
+          <button
+            class="deck-panel__close"
+            type="button"
+            (click)="closeDeckOverlay()"
+            aria-label="Close deck overlay"
+          >
+            <img [src]="closeIcon" alt="Close" />
+          </button>
+        </div>
+
+        <div class="deck-panel__body">
+          <div class="deck-panel__left">
+            @if (isDeckLoading()) {
+              <div class="deck-panel__status">Loading cards…</div>
+            } @else if (hasDeckError()) {
+              <div class="deck-panel__status deck-panel__status--error">Failed to load cards.</div>
+            } @else if (deckCards().length === 0) {
+              <div class="deck-panel__status">No cards found.</div>
+            } @else {
+              <div class="deck-cards-grid">
+                @for (card of deckCards(); track card.id) {
+                  <div class="deck-card-item">
+                    <div
+                      class="deck-card-item__visual"
+                      (mouseenter)="hoverCard(card)"
+                      (mouseleave)="clearHoveredCard()"
+                    >
+                      <app-card-display
+                        [cardId]="card.cardId"
+                        [characterId]="card.classId"
+                        [borderColor]="'black'"
+                        [name]="card.name ?? ''"
+                        [description]="card.description ?? ''"
+                        [manaCost]="card.manaCost"
+                        [mana]="card.mana"
+                        [attack]="card.attack"
+                        [armor]="card.armor"
+                        [magicAttack]="card.magicAttack"
+                        [magicArmor]="card.magicArmor"
+                        [defense]="card.defense"
+                        [healing]="card.heal"
+                        [poison]="card.poison"
+                        [rarity]="card.rarity"
+                        [permanent]="card.permanent"
+                        [draw]="card.draw"
+                        [strength]="card.strength"
+                        [effectMultiplier]="card.effectMultiplier"
+                        [momentum]="card.momentum"
+                        [daggers]="card.daggers"
+                        [spirit]="card.spirit"
+                        [fire]="card.fire ?? false"
+                        [water]="card.water ?? false"
+                        [earth]="card.earth ?? false"
+                        [air]="card.air ?? false"
+                      />
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="deck-panel__right">
+            <div class="card-preview-panel">
+              @if (hoveredCard(); as card) {
+                <app-card-display
+                  class="deck-card-preview-display"
+                  [cardId]="card.cardId"
+                  [characterId]="card.classId"
+                  [borderColor]="'black'"
+                  [name]="card.name ?? ''"
+                  [description]="card.description ?? ''"
+                  [manaCost]="card.manaCost"
+                  [mana]="card.mana"
+                  [attack]="card.attack"
+                  [armor]="card.armor"
+                  [magicAttack]="card.magicAttack"
+                  [magicArmor]="card.magicArmor"
+                  [defense]="card.defense"
+                  [healing]="card.heal"
+                  [poison]="card.poison"
+                  [rarity]="card.rarity"
+                  [permanent]="card.permanent"
+                  [draw]="card.draw"
+                  [strength]="card.strength"
+                  [effectMultiplier]="card.effectMultiplier"
+                  [momentum]="card.momentum"
+                  [daggers]="card.daggers"
+                  [spirit]="card.spirit"
+                  [fire]="card.fire ?? false"
+                  [water]="card.water ?? false"
+                  [earth]="card.earth ?? false"
+                  [air]="card.air ?? false"
+                />
+              } @else {
+                <div class="deck-preview-placeholder">Hover a card to preview</div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tooltip Overlay -->
+      @if (hoveredCard(); as card) {
+        <div
+          class="card-preview-tooltip-overlay"
+          (click)="$event.stopPropagation()"
+          [style.top.px]="tooltipTop()"
+          [style.left.px]="tooltipLeft()"
+          style="position: absolute; pointer-events: none; z-index: 11000;"
+        >
+          <app-card-tooltip [card]="card" />
+        </div>
+      }
+    </div>
+  }
+</div>

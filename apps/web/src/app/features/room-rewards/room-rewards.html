@@ -1,0 +1,414 @@
+<div class="room-rewards-wrapper" [style.backgroundImage]="'url(' + background + ')'">
+  <!-- Intro black overlay -->
+  <div class="intro-black-overlay" [class.intro-black-overlay--hidden]="!showIntroBlack()"></div>
+
+  <!-- ── Stage: chest ─────────────────────────────────────────────────── -->
+  @if (stage() === 'chest' || stage() === 'reward-pop') {
+    <div class="chest-scene">
+      <img
+        class="chest-image"
+        [src]="(chestPhase() === 'flash' || chestPhase() === 'open' || chestPhase() === 'fade') ? Assets.Images.Treasure.ChestOpen : Assets.Images.Treasure.ChestClosed"
+        alt="treasure chest"
+        [class.chest-image--shake-soft]="chestPhase() === 'shake-soft'"
+        [class.chest-image--shake-medium]="chestPhase() === 'shake-medium'"
+        [class.chest-image--shake-hard]="chestPhase() === 'shake-hard'"
+        [class.chest-image--open]="chestPhase() === 'flash' || chestPhase() === 'open' || chestPhase() === 'fade'"
+        [class.chest-image--fade]="chestPhase() === 'fade'"
+      />
+      <div class="chest-flash-overlay" [class.chest-flash-overlay--active]="chestPhase() === 'flash'"></div>
+
+      @if (stage() === 'reward-pop') {
+        <div
+          class="chest-reward-pop"
+          [style.--chest-reward-pop-duration]="chestRewardPopItemDurationMs + 'ms'"
+          [style.--chest-reward-pop-stagger]="chestRewardPopItemStaggerMs + 'ms'"
+        >
+          @if (blessingTypeIconUrl()) {
+            <div class="chest-reward-pop__item chest-reward-pop__item--blessing">
+              <span class="chest-reward-pop__count">1 x</span>
+              <img class="chest-reward-pop__icon" [src]="blessingTypeIconUrl()!" alt="blessing reward type" />
+            </div>
+          }
+
+          <div class="chest-reward-pop__item chest-reward-pop__item--cards">
+            <span class="chest-reward-pop__count">{{ currentPlayerCardCount() }} x</span>
+            <img class="chest-reward-pop__icon" [src]="rewardCardBackIcon" alt="reward cards" />
+          </div>
+
+          <div class="chest-reward-pop__item chest-reward-pop__item--gold">
+            <span class="chest-reward-pop__count">{{ currentPlayerTotalGold() }} x</span>
+            <img class="chest-reward-pop__icon" [src]="Assets.Images.Icons.Gold" alt="gold reward" />
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Stage: rewards / voting ──────────────────────────────────────── -->
+  @if (stage() === 'rewards' || stage() === 'voting') {
+    <div class="rewards-content" [class.rewards-content--blurred]="stage() === 'voting'">
+
+      @if (isLoading()) {
+        <div class="rewards-loading">Loading rewards…</div>
+      } @else if (hasError()) {
+        <div class="rewards-error">Failed to load rewards.</div>
+      } @else if (rewards()) {
+        <div class="rewards-header">
+          @if (blessingTypeIconUrl()) {
+            <img class="rewards-type-icon" [src]="blessingTypeIconUrl()!" alt="reward type icon" />
+          }
+          <h2 class="rewards-title">Choose Reward Cards</h2>
+        </div>
+
+        <div class="rewards-body">
+          <div class="rewards-main">
+            <div class="rewards-players">
+              <!-- Player sections -->
+              @for (player of rewards()!.players; track player.playerId) {
+                <div class="player-section" [class.player-section--current]="isCurrentPlayer(player)">
+
+                  <!-- Player header: gamer tag + card options -->
+                  <div class="player-section__header">
+                    <div class="player-gamer-tag" [class.player-gamer-tag--current]="isCurrentPlayer(player)">
+                      {{ getPlayerDisplayName(player) }}
+                    </div>
+                    <button
+                      class="player-deck-btn"
+                      type="button"
+                      (click)="openPlayerDeck(player)"
+                      [attr.aria-label]="'Open deck for ' + getPlayerDisplayName(player)"
+                    >
+                      <img class="player-deck-btn__icon" [src]="Assets.Images.Icons.Deck" alt="deck" />
+                    </button>
+
+                    @if (isCurrentPlayer(player) && player.cards.length > 0) {
+                      <div class="row-options">
+                        @for (card of player.cards; track card.instanceId) {
+                          <div
+                            class="reward-card-wrapper"
+                            [class.reward-card-wrapper--selected]="getCardSelection(player.playerId) === card.instanceId"
+                            (click)="selectCard(player.playerId, card.instanceId)"
+                            (mouseenter)="hoverCard(card)"
+                            (mouseleave)="clearHoveredCard()"
+                          >
+                            <app-card-display
+                              [cardId]="card.cardId"
+                              [characterId]="card.classId"
+                              [borderColor]="getMemberColor(card.partyMemberId)"
+                              [name]="card.name ?? ''"
+                              [description]="card.description ?? ''"
+                              [manaCost]="card.manaCost"
+                              [mana]="card.mana"
+                              [attack]="card.attack"
+                              [armor]="card.armor"
+                              [magicAttack]="card.magicAttack"
+                              [magicArmor]="card.magicArmor"
+                              [defense]="card.defense"
+                              [healing]="card.heal"
+                              [poison]="card.poison"
+                              [rarity]="card.rarity"
+                              [permanent]="card.permanent"
+                              [draw]="card.draw"
+                              [strength]="card.strength"
+                              [effectMultiplier]="card.effectMultiplier"
+                              [momentum]="card.momentum"
+                              [daggers]="card.daggers"
+                              [spirit]="card.spirit"
+                              [fire]="card.fire ?? false"
+                              [water]="card.water ?? false"
+                              [earth]="card.earth ?? false"
+                              [air]="card.air ?? false"
+                            />
+                          </div>
+                        }
+
+                        <button
+                          class="skip-option"
+                          [class.skip-option--selected]="getCardSelection(player.playerId) === 'skip'"
+                          (click)="skipCard(player.playerId)"
+                        >
+                          Skip
+                        </button>
+
+                      </div>
+                    }
+
+                    @if (isCurrentPlayer(player) && currentPlayerReward() && hasAnySelection()) {
+                      <div class="confirm-row">
+                        <button
+                          class="confirm-btn"
+                          [class.confirm-btn--ready]="canConfirmSelections()"
+                          [disabled]="!canConfirmSelections()"
+                          (click)="confirmSelections()"
+                        >
+                          Confirm Selections
+                        </button>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Party members -->
+                  <div class="party-members-list">
+                    @for (partyMemberId of getUniqueMemberIds(player); track partyMemberId) {
+                      <div class="party-member-row">
+                        <div class="party-member-summary">
+                          <div class="portrait-frame" [style.borderColor]="getMemberColor(partyMemberId)">
+                            <img
+                              class="portrait-img"
+                              [src]="getMemberPortrait(partyMemberId)"
+                              [alt]="getMemberName(partyMemberId)"
+                            />
+                          </div>
+                          <div class="member-name" [style.color]="getMemberColor(partyMemberId)">
+                            {{ getMemberName(partyMemberId) }}
+                          </div>
+                          <div class="gold-reward">
+                            <img class="gold-icon" [src]="Assets.Images.Icons.Gold" alt="gold" />
+                            <span class="gold-amount">{{ getMemberGold(player, partyMemberId) }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
+          </div>
+
+          <!-- Large card preview panel (shown on hover) -->
+          @if (hoveredCard(); as card) {
+            <div class="card-preview-panel">
+              <app-card-display
+                [cardId]="card.cardId"
+                [characterId]="card.classId"
+                [borderColor]="getMemberColor(card.partyMemberId)"
+                [name]="card.name ?? ''"
+                [description]="card.description ?? ''"
+                [manaCost]="card.manaCost"
+                [mana]="card.mana"
+                [attack]="card.attack"
+                [armor]="card.armor"
+                [magicAttack]="card.magicAttack"
+                [magicArmor]="card.magicArmor"
+                [defense]="card.defense"
+                [healing]="card.heal"
+                [poison]="card.poison"
+                [rarity]="card.rarity"
+                [permanent]="card.permanent"
+                [draw]="card.draw"
+                [strength]="card.strength"
+                [effectMultiplier]="card.effectMultiplier"
+                [momentum]="card.momentum"
+                [daggers]="card.daggers"
+                [spirit]="card.spirit"
+                [fire]="card.fire ?? false"
+                [water]="card.water ?? false"
+                [earth]="card.earth ?? false"
+                [air]="card.air ?? false"
+              />
+              <div class="card-preview-tooltip">
+                <app-card-tooltip [card]="card" />
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- ── Voting overlay ─────────────────────────────────────────────── -->
+    @if (stage() === 'voting') {
+      <div class="voting-overlay">
+        <div class="voting-panel">
+
+          @if (blessingTypeIconUrl()) {
+            <img class="voting-type-icon" [src]="blessingTypeIconUrl()!" alt="blessing type" />
+          }
+
+          <h2 class="voting-title">Who receives the blessing?</h2>
+
+          <div class="vote-members-row">
+            @for (memberId of allRewardMemberIds(); track memberId) {
+              <div
+                class="vote-member"
+                [class.vote-member--selected]="votedMemberId() === memberId"
+                [style.--member-color]="getMemberColor(memberId)"
+                (click)="voteForMember(memberId)"
+              >
+                <div class="portrait-frame portrait-frame--vote" [style.borderColor]="getMemberColor(memberId)">
+                  <img
+                    class="portrait-img"
+                    [src]="getMemberPortrait(memberId)"
+                    [alt]="getMemberName(memberId)"
+                  />
+                </div>
+                <div class="member-name" [style.color]="getMemberColor(memberId)">
+                  {{ getMemberName(memberId) }}
+                </div>
+              </div>
+            }
+          </div>
+
+          <button
+            class="confirm-btn confirm-btn--vote"
+            [class.confirm-btn--ready]="votedMemberId() !== null"
+            [disabled]="votedMemberId() === null"
+            (click)="confirmVote()"
+          >
+            Confirm Vote
+          </button>
+
+        </div>
+      </div>
+    }
+
+    @if (isDeckOverlayOpen()) {
+      <div class="deck-overlay" (click)="closeDeckOverlay()">
+        <div class="deck-panel" (click)="$event.stopPropagation()">
+          <div class="deck-panel__header">
+            <h3 class="deck-panel__title">{{ selectedDeckPlayerTag() }} Deck</h3>
+            <button class="deck-panel__close" type="button" (click)="closeDeckOverlay()" aria-label="Close deck overlay">×</button>
+          </div>
+
+          <div class="deck-panel__body">
+            <div class="deck-panel__left">
+              @if (isDeckLoading()) {
+                <div class="deck-panel__status">Loading deck…</div>
+              } @else if (hasDeckError()) {
+                <div class="deck-panel__status deck-panel__status--error">Failed to load deck.</div>
+              } @else if (deckCards().length === 0) {
+                <div class="deck-panel__status">No cards found.</div>
+              } @else {
+                <div class="deck-cards-grid">
+                  @for (card of deckCards(); track card.instanceId) {
+                    <div class="deck-card-item">
+                      <div
+                        class="deck-card-item__visual"
+                        (mouseenter)="hoverDeckCard(card)"
+                        (mouseleave)="clearDeckHoveredCard()"
+                      >
+                        <app-card-display
+                          [cardId]="card.cardId"
+                          [characterId]="card.classId"
+                          [borderColor]="card.color ?? getMemberColor(card.partyMemberId)"
+                          [name]="card.name ?? ''"
+                          [description]="card.description ?? ''"
+                          [manaCost]="card.manaCost"
+                          [mana]="card.mana"
+                          [attack]="card.attack"
+                          [armor]="card.armor"
+                          [magicAttack]="card.magicAttack"
+                          [magicArmor]="card.magicArmor"
+                          [defense]="card.defense"
+                          [healing]="card.heal"
+                          [poison]="card.poison"
+                          [rarity]="card.rarity"
+                          [permanent]="card.permanent"
+                          [draw]="card.draw"
+                          [strength]="card.strength"
+                          [effectMultiplier]="card.effectMultiplier"
+                          [momentum]="card.momentum"
+                          [daggers]="card.daggers"
+                          [spirit]="card.spirit"
+                          [fire]="card.fire ?? false"
+                          [water]="card.water ?? false"
+                          [earth]="card.earth ?? false"
+                          [air]="card.air ?? false"
+                        />
+                      </div>
+                      <div class="deck-card-usage">
+                        <div class="deck-card-usage__bar">
+                          <div class="deck-card-usage__fill" [style.width.%]="getDeckCardUseProgress(card.useCount)"></div>
+                        </div>
+                        <div class="deck-card-usage__label">{{ card.useCount }} / {{ deckCardMaxUseCount }}</div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="deck-panel__right">
+              <div class="card-preview-panel card-preview-panel--deck">
+                @if (deckHoveredCard(); as card) {
+                  <app-card-display
+                    [cardId]="card.cardId"
+                    [characterId]="card.classId"
+                    [borderColor]="card.color ?? getMemberColor(card.partyMemberId)"
+                    [name]="card.name ?? ''"
+                    [description]="card.description ?? ''"
+                    [manaCost]="card.manaCost"
+                    [mana]="card.mana"
+                    [attack]="card.attack"
+                    [armor]="card.armor"
+                    [magicAttack]="card.magicAttack"
+                    [magicArmor]="card.magicArmor"
+                    [defense]="card.defense"
+                    [healing]="card.heal"
+                    [poison]="card.poison"
+                    [rarity]="card.rarity"
+                    [permanent]="card.permanent"
+                    [draw]="card.draw"
+                    [strength]="card.strength"
+                    [effectMultiplier]="card.effectMultiplier"
+                    [momentum]="card.momentum"
+                    [daggers]="card.daggers"
+                    [spirit]="card.spirit"
+                    [fire]="card.fire ?? false"
+                    [water]="card.water ?? false"
+                    [earth]="card.earth ?? false"
+                    [air]="card.air ?? false"
+                  />
+                  <div class="card-preview-tooltip">
+                    <app-card-tooltip [card]="card" />
+                  </div>
+                } @else {
+                  <div class="deck-preview-placeholder">Hover a card to preview</div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- ── Stage: blessings ──────────────────────────────────────────────── -->
+  @if (stage() === 'blessings') {
+    <div class="blessings-content">
+      <h2 class="blessings-title">Room Blessings</h2>
+
+      <div class="blessings-row" [class.blessings-row--disabled]="isConfirmingReward()">
+        @for (blessing of rewards()!.blessings; track blessing.blessingId) {
+          <div
+            class="blessing-card"
+            [style.--rarity-color]="getBlessingRarityColor(blessing.rarity)"
+            [class.blessing-card--selected]="selectedBlessingId() === blessing.blessingId"
+            (click)="selectBlessing(blessing.blessingId)"
+          >
+            <img
+              class="blessing-image"
+              [src]="getBlessingImage(blessing)"
+              [alt]="blessing.name ?? 'Blessing'"
+            />
+            <div class="blessing-info">
+              @if (getBlessingTypeIcon(blessing.type)) {
+                <img class="blessing-type-icon" [src]="getBlessingTypeIcon(blessing.type)" alt="type" />
+              }
+              <div class="blessing-name">{{ blessing.name }}</div>
+              <div class="blessing-desc">{{ blessing.description }}</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (isConfirmingReward()) {
+        <div class="blessings-status">Applying blessing...</div>
+      }
+      @if (hasConfirmRewardError()) {
+        <div class="blessings-status blessings-status--error">Failed to confirm blessing. Please try again.</div>
+      }
+    </div>
+  }
+
+</div>

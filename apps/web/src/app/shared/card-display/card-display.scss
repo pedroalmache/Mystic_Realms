@@ -1,0 +1,217 @@
+@font-face {
+    font-family: 'Germania One';
+    src: url('/assets/fonts/GermaniaOne-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Ropa Sans';
+    src: url('/assets/fonts/RopaSans-Regular.ttf') format('truetype');
+}
+
+.card-display-container {
+    height: 292px;
+    width: 192px;
+    background-image: url('/assets/images/cards/display/card_front.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+}
+
+.color-border {
+    border-radius: 17px;
+    border: 7px solid;
+    height:278px;
+}
+
+.image-frame {
+    width: 146px;
+    height: 158px;
+    position: relative;
+    top: 15px;
+    left: 16px;
+}
+
+.main-image-container {
+    width: 132px;
+    height: 148px;
+    position: relative;
+    top: 6px;
+    left: 7px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.main-image {
+    height: 100%;
+}
+
+.frame {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.name {
+    width: 169px;
+    height: 42px;
+    background-image: url('/assets/images/cards/display/card_name.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    top: 10px;
+    z-index: 2;
+    font-family: 'Germania One', sans-serif;
+    text-align: center;
+    line-height: 30px;
+    font-size: 16px;
+}
+
+.description {
+    width: 149px;
+    height: 84px;
+    background-image: url('/assets/images/cards/display/card_description.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    top: -13px;
+    font-family: 'Ropa Sans', sans-serif;
+    text-align: center;
+    padding: 24px;
+    box-sizing: border-box;
+    color: black;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .description-content {
+        width: 100%;
+        flex-shrink: 0;
+
+        &.medium-description {
+            transform: scale(0.8);
+            transform-origin: center;
+            width: 125%;
+        }
+
+        &.long-description {
+            transform: scale(0.5);
+            transform-origin: center;
+            width: 200%;
+        }
+    }
+}
+
+.mana {
+    width: 45px;
+    height: 61px;
+    background-image: url('/assets/images/cards/display/cost_holder.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-family: 'Germania One', sans-serif;
+    text-align: center;
+    font-size: 20px;
+    padding-top: 12px;
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.permanent {
+    width: 45px;
+    height:45px;
+    background-image: url('/assets/images/cards/display/permanent_holder.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 132px;
+    left: 75px;
+    font-family: 'Germania One', sans-serif;
+    text-align: center;
+    font-size: 20px;
+    padding-top: 12px;
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    z-index:10000;
+    img {
+        width: 32px;
+        height: 32px;
+        position: relative;
+        filter:
+    drop-shadow(-1px -1px 0 #000)
+    drop-shadow(1px -1px 0 #000)
+    drop-shadow(-1px 1px 0 #000)
+    drop-shadow(1px 1px 0 #000);
+    }
+}
+
+.stat{
+    width: 45px;
+    height: 45px;
+    background-image: url('/assets/images/cards/display/stat_holder.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-family: 'Germania One', sans-serif;
+    text-align: center;
+    font-size: 20px;
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.stat-icon {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    opacity: 1;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.stat-value {
+    position: relative;
+    z-index: 2;
+    line-height: 1;
+}
+
+.rarity {
+    width: 19px;
+    height: 8px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 205px;
+    left: 86px;
+    z-index: 4;
+}
+
+.resized-icon {
+    height: 19px;
+    position: relative;
+    top: 3px;
+}

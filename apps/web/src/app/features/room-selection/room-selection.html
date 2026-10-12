@@ -1,0 +1,49 @@
+<div class="room-selection-wrapper" [style.backgroundImage]="'url(' + background + ')'">
+  @if (isLoading()) {
+    <div class="room-selection-loading">
+      <div class="room-selection-loading__spinner" aria-label="Loading…"></div>
+    </div>
+  } @else if (hasError() || !options()) {
+    <div class="room-selection-error">Could not load room options.</div>
+  } @else {
+    <div class="room-selection-panels">
+      <!-- Left panel -->
+      <div class="room-option room-option--left" (click)="selectRoom(NextRoomDirection.Left)" role="button" tabindex="0"
+           [attr.aria-label]="'Choose ' + getRoomLabel(options()!.left)"
+           (keydown.enter)="selectRoom(NextRoomDirection.Left)"
+           (keydown.space)="selectRoom(NextRoomDirection.Left); $event.preventDefault()">
+        <div class="room-option__highlight"></div>
+        <div class="room-option__content">
+          <div class="room-option__icon-stack">
+            <img class="room-option__room-icon" [src]="roomIcon" alt="Room" />
+            @if (getOverlayIcon(options()!.left)) {
+              <div class="room-option__type-icon-wrapper">
+                <img class="room-option__type-icon" [src]="getOverlayIcon(options()!.left)" alt="Room type" />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- Right panel -->
+      <div class="room-option room-option--right" (click)="selectRoom(NextRoomDirection.Right)" role="button" tabindex="0"
+           [attr.aria-label]="'Choose ' + getRoomLabel(options()!.right)"
+           (keydown.enter)="selectRoom(NextRoomDirection.Right)"
+           (keydown.space)="selectRoom(NextRoomDirection.Right); $event.preventDefault()">
+        <div class="room-option__highlight"></div>
+        <div class="room-option__content">
+          <div class="room-option__icon-stack">
+            <img class="room-option__room-icon" [src]="roomIcon" alt="Room" />
+            @if (getOverlayIcon(options()!.right)) {
+              <div class="room-option__type-icon-wrapper">
+                <img class="room-option__type-icon" [src]="getOverlayIcon(options()!.right)" alt="Room type" />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

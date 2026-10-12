@@ -1,0 +1,206 @@
+<div
+  class="character-wrapper"
+  [class.selectable]="isSelectable()"
+  [class.selected]="isSelected()"
+  [class.attacking]="isAttacking()"
+  [class.defending]="isDefending()"
+  [class.spiriting]="isSpiriting()"
+  [style.--selected-color]="selectedColor()"
+  (click)="onClick()"
+>
+  @if (className()) {
+    <span class="character-class-name" [style.color]="nameColor() ?? '#ffffff'">{{
+      className()
+    }}</span>
+  }
+  @if (momentumRows().length > 0) {
+    <div class="momentum-container">
+      @for (row of momentumRows(); track row.id) {
+        <div class="momentum-row">
+          @for (m of row.items; track m.id) {
+            <img
+              class="momentum-icon"
+              [class.fading]="m.fading"
+              src="assets/images/characters/warrior/powers/momentum.png"
+              alt="Momentum"
+            />
+          }
+        </div>
+      }
+    </div>
+  }
+  @if (daggers() > 0 || isDaggersFadingOut()) {
+    <div class="daggers-container" [class.fading]="isDaggersFadingOut()">
+      <span class="daggers-value">{{ daggers() }}</span>
+      <div class="daggers-circle">
+        <img
+          class="daggers-icon"
+          src="assets/images/characters/assassin/powers/poison.png"
+          alt="Daggers"
+        />
+      </div>
+    </div>
+  }
+  <div class="elements-container">
+    @if (fire() || isFireFadingOut()) {
+      <img
+        class="element-icon"
+        [class.fading]="isFireFadingOut()"
+        [src]="Assets.Images.Characters.Elementalist.Powers.Fire"
+        alt="Fire"
+      />
+    }
+    @if (water() || isWaterFadingOut()) {
+      <img
+        class="element-icon"
+        [class.fading]="isWaterFadingOut()"
+        [src]="Assets.Images.Characters.Elementalist.Powers.Water"
+        alt="Water"
+      />
+    }
+    @if (earth() || isEarthFadingOut()) {
+      <img
+        class="element-icon"
+        [class.fading]="isEarthFadingOut()"
+        [src]="Assets.Images.Characters.Elementalist.Powers.Earth"
+        alt="Earth"
+      />
+    }
+    @if (air() || isAirFadingOut()) {
+      <img
+        class="element-icon"
+        [class.fading]="isAirFadingOut()"
+        [src]="Assets.Images.Characters.Elementalist.Powers.Air"
+        alt="Air"
+      />
+    }
+  </div>
+  @if (spirit() > 0 || isSpiritFadingOut()) {
+    <div class="spirit-container" [class.fading]="isSpiritFadingOut()">
+      <div class="spirit-circle">
+        @if (displayedSpiritIcon(); as iconUrl) {
+          <img class="spirit-icon" [src]="iconUrl" alt="Spirit" />
+        }
+      </div>
+    </div>
+  }
+  <img class="character-sprite" [src]="displayedSprite()" [alt]="altText()" />
+  @if (isHealing() && healingSprite()) {
+    <img class="heal-overlay" [src]="healingSprite()!" alt="" aria-hidden="true" />
+  }
+  @if (isPoisoning() && poisonSprite()) {
+    <img class="heal-overlay" [src]="poisonSprite()!" alt="" aria-hidden="true" />
+  }
+  @if (showHpDelta()) {
+    <span
+      class="hp-delta"
+      [class.hp-delta--positive]="(displayedHpDelta() ?? 0) > 0"
+      [class.hp-delta--negative]="(displayedHpDelta() ?? 0) < 0"
+      [class.hp-delta--healing]="hpDeltaTone() === 'healing'"
+    >
+      {{ (displayedHpDelta() ?? 0) > 0 ? '+' : '' }}{{ displayedHpDelta() }}
+    </span>
+  }
+  @if (showPoisonDelta()) {
+    <span class="hp-delta poison-delta">
+      {{ (displayedPoisonDelta() ?? 0) > 0 ? '+' : '' }}{{ displayedPoisonDelta() }}
+    </span>
+  }
+  @if (showArmorBurst()) {
+    <div class="armor-burst">
+      <img class="armor-burst__icon" [src]="armorIcon()" alt="" aria-hidden="true" />
+      <span
+        class="armor-burst__delta"
+        [class.armor-burst__delta--positive]="(displayedArmorDelta() ?? 0) > 0"
+        [class.armor-burst__delta--negative]="(displayedArmorDelta() ?? 0) < 0"
+      >
+        {{ armorDeltaText() }}
+      </span>
+    </div>
+  }
+  @if (showStrengthBurst()) {
+    <div class="strength-burst">
+      <img
+        class="strength-burst__icon"
+        [src]="Assets.Images.Icons.Strength"
+        alt=""
+        aria-hidden="true"
+      />
+      <span
+        class="strength-burst__delta"
+        [class.strength-burst__delta--positive]="(displayedStrengthDelta() ?? 0) > 0"
+        [class.strength-burst__delta--negative]="(displayedStrengthDelta() ?? 0) < 0"
+      >
+        {{ strengthDeltaText() }}
+      </span>
+    </div>
+  }
+  @if (showSpeedBurst()) {
+    <div class="speed-burst">
+      <img class="speed-burst__icon" [src]="Assets.Images.Icons.Speed" alt="" aria-hidden="true" />
+      <span
+        class="speed-burst__delta"
+        [class.speed-burst__delta--positive]="(displayedSpeedDelta() ?? 0) > 0"
+        [class.speed-burst__delta--negative]="(displayedSpeedDelta() ?? 0) < 0"
+      >
+        {{ (displayedSpeedDelta() ?? 0) > 0 ? '+' : '' }}{{ displayedSpeedDelta() }}
+      </span>
+    </div>
+  }
+  @if (showDefenseBurst()) {
+    <div class="defense-burst">
+      <img
+        class="defense-burst__icon"
+        [src]="Assets.Images.Icons.Armor"
+        alt=""
+        aria-hidden="true"
+      />
+      <span
+        class="defense-burst__delta"
+        [class.defense-burst__delta--positive]="(displayedDefenseDelta() ?? 0) > 0"
+        [class.defense-burst__delta--negative]="(displayedDefenseDelta() ?? 0) < 0"
+      >
+        {{ defenseDeltaText() }}
+      </span>
+    </div>
+  }
+  <div class="health-armor-row">
+    <div class="health-bar-container">
+      <div class="health-bar-fill" [style.width.%]="hpPercent()"></div>
+    </div>
+    @if (armor() > 0) {
+      <div class="armor-indicator">
+        <img class="shield-icon" [src]="Assets.Images.Icons.Shield" alt="Armor" />
+        <span class="armor-value">{{ armor() }}</span>
+      </div>
+    }
+    @if (magicArmor() > 0) {
+      <div class="armor-indicator armor-indicator--left">
+        <img class="shield-icon" [src]="Assets.Images.Icons.MagicShield" alt="Magic Armor" />
+        <span class="armor-value">{{ magicArmor() }}</span>
+      </div>
+    }
+  </div>
+  @if (strength() > 0 || defense() > 0 || poison() > 0) {
+    <div class="combat-stats-indicator">
+      @if (strength() > 0) {
+        <div class="combat-stat">
+          <span class="strength-value">{{ strength() }}</span>
+          <img class="strength-icon" [src]="Assets.Images.Icons.Strength" alt="Strength" />
+        </div>
+      }
+      @if (defense() > 0) {
+        <div class="combat-stat">
+          <span class="defense-value">{{ defense() }}</span>
+          <img class="defense-icon" [src]="Assets.Images.Icons.Armor" alt="Defense" />
+        </div>
+      }
+      @if (poison() > 0) {
+        <div class="combat-stat">
+          <span class="poison-value">{{ poison() }}</span>
+          <img class="poison-icon" [src]="Assets.Images.Icons.Poison" alt="Poison" />
+        </div>
+      }
+    </div>
+  }
+</div>

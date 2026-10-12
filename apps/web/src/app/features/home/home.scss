@@ -1,0 +1,199 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Fills the 1600×900 game frame provided by GameContainerComponent */
+.home-wrapper {
+  width: 100%;
+  height: 100%;
+  background-color: #0a0012;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  color: rgba(220 200 255 / 0.9);
+  font-family: inherit;
+}
+
+/* Game code badge in the top-left corner */
+.game-code-badge {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding: 0.5rem 1.5rem 0.6rem 1rem;
+  font-family: 'Bangers', cursive;
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0 0 0 / 0.7);
+  z-index: 10;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 60px;
+  width: 500px;
+  justify-content: center;
+}
+
+.game-code-text {
+  user-select: none;
+}
+
+.copy-code-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(255 255 255 / 0.8);
+  padding: 0.15rem;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+
+  &:hover {
+    color: #fff;
+    background: rgba(255 255 255 / 0.15);
+  }
+
+  &:active {
+    background: rgba(255 255 255 / 0.25);
+  }
+}
+
+/* Two-panel layout */
+.panels {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+}
+
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.panel-label {
+  font-family: 'Bangers', cursive;
+  font-size: 1.8rem;
+  letter-spacing: 0.1em;
+  color: rgba(220 200 255 / 0.9);
+  text-shadow: 0 1px 4px rgba(0 0 0 / 0.7);
+  text-transform: uppercase;
+}
+
+/* Wrapper that keeps icon + button centered; new-game-link is absolute so it won't shift them */
+.panel-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  position: relative;
+}
+
+.panel-icon {
+  width: 220px;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* "COMING SOON" text for multi-player panel */
+.coming-soon {
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #888;
+  text-shadow: none;
+  font-family: 'Bangers', cursive;
+}
+
+/* Small "New Game" link shown under CONTINUE – absolutely positioned so the button stays centered */
+.new-game-link {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 2rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: color 0.15s;
+  font-family: 'Bangers', serif;
+  color: #f9faf9;
+  text-shadow: 0 1px 4px rgba(0 0 0 / 0.7);
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+/* Loading spinner */
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(180 126 255 / 0.3);
+  border-top-color: #b47eff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Green button using the UI asset */
+.game-btn {
+  width: 260px;
+  height: 72px;
+  background-color: transparent;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0 0 0 / 0.7);
+  transition: transform 0.1s ease, filter 0.1s ease;
+  font-family: 'Bangers', serif;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+
+  &:active {
+    transform: scale(0.93);
+    filter: brightness(0.9);
+  }
+}
+

@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MysticRealms.Application/MysticRealms.Application.csproj" />
+    <Project Path="src/MysticRealms.Domain/MysticRealms.Domain.csproj" />
+    <Project Path="src/MysticRealms.Infrastructure/MysticRealms.Infrastructure.csproj" />
+    <Project Path="src/MysticRealms.ServerApi/MysticRealms.ServerApi.csproj" />
+  </Folder>
+</Solution>

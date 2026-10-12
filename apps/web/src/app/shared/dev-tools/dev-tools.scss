@@ -1,0 +1,315 @@
+:host {
+  position: fixed;
+  bottom: 2.5rem;
+  right: 1rem;
+  z-index: 10000;
+}
+
+.dev-tools-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.dev-tools-btn {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(30, 30, 40, 0.9);
+  color: #e0e0ff;
+  border: 1px solid rgba(130, 100, 255, 0.5);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(60, 50, 90, 0.95);
+  }
+}
+
+.dev-tools-menu {
+  position: absolute;
+  bottom: calc(100% + 0.4rem);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(20, 20, 30, 0.97);
+  border: 1px solid rgba(130, 100, 255, 0.4);
+  border-radius: 0.375rem;
+  overflow: hidden;
+  min-width: 8rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.dev-tools-menu-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  color: #d0d0f0;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(130, 100, 255, 0.2);
+  }
+}
+
+/* === Modal overlay === */
+.dev-tools-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 11000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.dev-tools-dialog {
+  background: #1a1a2e;
+  border: 1px solid rgba(130, 100, 255, 0.5);
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 800px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.dev-tools-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(130, 100, 255, 0.3);
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #c0b0ff;
+    text-transform: capitalize;
+  }
+}
+
+.dev-tools-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #a090d0;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: color 0.15s, background 0.15s;
+
+  &:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.dev-tools-dialog-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0.5rem;
+}
+
+/* === Breadcrumb === */
+.dev-tools-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.5rem;
+  margin-bottom: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-btn {
+  background: transparent;
+  border: none;
+  color: #a090d0;
+  cursor: pointer;
+  padding: 0.1rem 0.25rem;
+  border-radius: 0.2rem;
+  font-size: 0.75rem;
+  transition: color 0.15s, background 0.15s;
+
+  &:hover {
+    color: #c0b0ff;
+    background: rgba(130, 100, 255, 0.15);
+  }
+}
+
+.breadcrumb-sep {
+  color: rgba(160, 144, 208, 0.5);
+  user-select: none;
+}
+
+.breadcrumb-current {
+  color: #e0d8ff;
+  font-weight: 600;
+  padding: 0.1rem 0.25rem;
+}
+
+/* === Folder list === */
+.dev-tools-folder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.dev-tools-folder-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  background: transparent;
+  border: 1px solid rgba(130, 100, 255, 0.15);
+  border-radius: 0.3rem;
+  color: #c0b0ff;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.8rem;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: rgba(130, 100, 255, 0.12);
+    border-color: rgba(130, 100, 255, 0.35);
+  }
+
+  .folder-icon {
+    flex-shrink: 0;
+    color: #9080c0;
+  }
+
+  .folder-name {
+    flex: 1;
+  }
+
+  .folder-badge {
+    font-size: 0.7rem;
+    color: #7060a0;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.75rem;
+  }
+}
+
+/* === Table === */
+.dev-tools-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  color: #d0d0f0;
+
+  th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    background: rgba(0, 0, 0, 0.3);
+    color: #a090d0;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(130, 100, 255, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  td {
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background: rgba(130, 100, 255, 0.07);
+  }
+}
+
+.asset-name {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #b0c8ff;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* === Asset preview === */
+.asset-preview {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+  overflow: hidden;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+/* === Icon buttons === */
+.dev-tools-controls {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.25rem;
+  color: #c0c0e0;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+}
+
+.play-btn:hover {
+  background: rgba(80, 200, 80, 0.25);
+  border-color: rgba(80, 200, 80, 0.5);
+  color: #80ff80;
+}
+
+.stop-btn:hover {
+  background: rgba(220, 60, 60, 0.25);
+  border-color: rgba(220, 60, 60, 0.5);
+  color: #ff8080;
+}
+
+.copy-btn.copied {
+  background: rgba(80, 200, 80, 0.2);
+  border-color: rgba(80, 200, 80, 0.5);
+  color: #80ff80;
+}

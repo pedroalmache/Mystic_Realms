@@ -1,0 +1,683 @@
+:host {
+  display: contents;
+}
+
+.character-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  border-radius: 8px;
+  transition:
+    filter 0.2s ease,
+    transform 0.2s ease;
+  direction: ltr;
+
+  &.selectable {
+    cursor: pointer;
+    animation: selectable-pulse 1.2s ease-in-out infinite;
+
+    &:hover {
+      transform: scale(1.06);
+    }
+  }
+
+  &.selected {
+    animation: none;
+    filter: drop-shadow(0 0 12px var(--selected-color, rgba(255, 215, 0, 1)))
+      drop-shadow(0 0 6px var(--selected-color, rgba(255, 215, 0, 0.7)));
+    transform: scale(1.04);
+  }
+
+  &.attacking {
+    animation: none;
+    filter: drop-shadow(0 0 20px rgba(255, 120, 0, 0.95))
+      drop-shadow(0 0 8px rgba(255, 220, 0, 0.7));
+    transform: scale(1.2);
+  }
+
+  &.defending {
+    animation: none;
+    filter: drop-shadow(0 0 18px rgba(255, 50, 50, 0.9)) drop-shadow(0 0 8px rgba(200, 0, 0, 0.6));
+    transform: scale(0.95);
+  }
+
+  &.spiriting {
+    animation: none;
+    filter: drop-shadow(0 0 20px rgba(251, 233, 87, 0.95))
+      drop-shadow(0 0 8px rgba(251, 233, 87, 0.7));
+    transform: scale(1.2);
+  }
+}
+
+@keyframes selectable-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.95))
+      drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+  }
+}
+
+.character-class-name {
+  font-family: 'Bangers', cursive;
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow:
+    1px 1px 3px rgba(0, 0, 0, 0.9),
+    0 0 6px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  line-height: 1.2;
+}
+
+.character-sprite {
+  height: 180px;
+  width: auto;
+}
+
+.heal-overlay {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 3;
+  animation: heal-overlay-fade 3s ease-out forwards;
+}
+
+@keyframes heal-overlay-fade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+.armor-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 96px;
+  height: 96px;
+  transform: translate(-50%, -58%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+  animation: armor-burst 1.4s ease-out forwards;
+
+  &__icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(120, 190, 255, 0.95));
+  }
+
+  &__delta {
+    position: absolute;
+    font-family: 'Bangers', cursive;
+    font-size: 28px;
+    letter-spacing: 1px;
+    color: #fff;
+    text-shadow:
+      0 0 12px rgba(0, 0, 0, 0.9),
+      1px 1px 3px rgba(0, 0, 0, 1);
+
+    &--positive {
+      color: #b9fbc0;
+    }
+
+    &--negative {
+      color: #ffadad;
+    }
+  }
+}
+
+@keyframes armor-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -58%) scale(0.2);
+  }
+  25% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 1;
+    transform: translate(-50%, -58%) scale(1.35);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -58%) scale(1.7);
+  }
+}
+
+.hp-delta {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Bangers', cursive;
+  font-size: 34px;
+  letter-spacing: 1px;
+  color: #fff;
+  pointer-events: none;
+  z-index: 4;
+  text-shadow:
+    0 0 10px rgba(0, 0, 0, 0.9),
+    1px 1px 3px rgba(0, 0, 0, 1);
+  animation: hp-delta-float 1.5s ease-out forwards;
+
+  &--positive {
+    color: #b9fbc0;
+  }
+
+  &--negative {
+    color: #ffadad;
+  }
+
+  &.hp-delta--healing {
+    color: #ffd447;
+  }
+
+  &.poison-delta {
+    color: #b9fbc0;
+  }
+}
+
+@keyframes hp-delta-float {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-64px);
+  }
+}
+
+.health-armor-row {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  padding: 0 2px;
+}
+
+.health-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.health-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #dc2626, #f87171);
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.armor-indicator {
+  position: absolute;
+  top: 50%;
+  right: -4px;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  z-index: 1;
+}
+
+.armor-indicator--left {
+  left: -4px;
+  right: auto;
+}
+
+.shield-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.armor-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  line-height: 1;
+  color: #fff;
+  font-weight: bold;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+  font-family: 'Germania One', sans-serif;
+}
+
+.combat-stats-indicator {
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+.combat-stat {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.strength-icon,
+.speed-icon {
+  height: 24px;
+  object-fit: contain;
+}
+
+.defense-icon {
+  height: 24px;
+  object-fit: contain;
+}
+
+.strength-value,
+.speed-value {
+  font-size: 20px;
+  line-height: 1;
+  color: #fff;
+  font-weight: bold;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+  font-family: 'Germania One', sans-serif;
+}
+
+.defense-value {
+  font-size: 20px;
+  line-height: 1;
+  color: #fff;
+  font-weight: bold;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+  font-family: 'Germania One', sans-serif;
+}
+
+.poison-icon {
+  height: 24px;
+  object-fit: contain;
+}
+
+.poison-value {
+  font-size: 20px;
+  line-height: 1;
+  color: #fff;
+  font-weight: bold;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+  font-family: 'Germania One', sans-serif;
+}
+
+.strength-burst,
+.speed-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 96px;
+  height: 96px;
+  transform: translate(-50%, -58%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+  animation: strength-burst 1.4s ease-out forwards;
+
+  &__icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(255, 160, 60, 0.95));
+  }
+
+  &__delta {
+    position: absolute;
+    font-family: 'Bangers', cursive;
+    font-size: 28px;
+    letter-spacing: 1px;
+    color: #fff;
+    text-shadow:
+      0 0 12px rgba(0, 0, 0, 0.9),
+      1px 1px 3px rgba(0, 0, 0, 1);
+
+    &--positive {
+      color: #ffd47a;
+    }
+
+    &--negative {
+      color: #ffadad;
+    }
+  }
+}
+
+.speed-burst {
+  &__icon {
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.95));
+  }
+
+  &__delta {
+    &--positive {
+      color: #ffffff;
+    }
+    &--negative {
+      color: #ffadad;
+    }
+  }
+}
+
+.defense-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 96px;
+  height: 96px;
+  transform: translate(-50%, -58%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+  animation: defense-burst 1.4s ease-out forwards;
+
+  &__icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(133, 197, 255, 0.95));
+  }
+
+  &__delta {
+    position: absolute;
+    font-family: 'Bangers', cursive;
+    font-size: 28px;
+    letter-spacing: 1px;
+    color: #fff;
+    text-shadow:
+      0 0 12px rgba(0, 0, 0, 0.9),
+      1px 1px 3px rgba(0, 0, 0, 1);
+
+    &--positive {
+      color: #87d2ff;
+    }
+
+    &--negative {
+      color: #ffadad;
+    }
+  }
+}
+
+@keyframes strength-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -58%) scale(0.2);
+  }
+  25% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 1;
+    transform: translate(-50%, -58%) scale(1.35);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -58%) scale(1.7);
+  }
+}
+
+@keyframes defense-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -58%) scale(0.2);
+  }
+  25% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 1;
+    transform: translate(-50%, -58%) scale(1.35);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -58%) scale(1.7);
+  }
+}
+
+.momentum-container {
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column-reverse; /* Stack rows bottom-to-top */
+  align-items: center;
+  gap: 2px;
+  z-index: 5;
+}
+
+.momentum-row {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+}
+
+.momentum-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  animation: momentum-fade-in-up 0.3s ease-out forwards;
+}
+
+@keyframes momentum-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.momentum-icon.fading {
+  animation: momentum-fade-out-down 0.3s ease-out forwards;
+}
+
+@keyframes momentum-fade-out-down {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.9);
+  }
+}
+
+@keyframes daggers-fade-out {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.daggers-container {
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 5;
+
+  &.fading {
+    animation: daggers-fade-out 0.6s ease-out forwards;
+  }
+}
+
+.daggers-value {
+  font-family: 'Bangers', cursive;
+  font-size: 24px;
+  color: #a4f494; /* Light greenish color for poison/daggers */
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000,
+    0 0 6px rgba(0, 0, 0, 0.8);
+}
+
+.daggers-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(164, 244, 148, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.daggers-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.elements-container {
+  position: absolute;
+  top: -40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 4px;
+  z-index: 5;
+}
+
+.element-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+  animation: element-grow 0.6s ease-out forwards;
+
+  &.fading {
+    animation: element-shrink 0.6s ease-out forwards;
+  }
+}
+
+@keyframes element-grow {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes element-shrink {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+@keyframes spirit-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spirit-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+.spirit-container {
+  position: absolute;
+  top: -40px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 4px;
+  z-index: 5;
+
+  &.fading {
+    animation: spirit-fade-out 0.6s ease-out forwards;
+  }
+}
+
+.spirit-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.spirit-icon {
+  width: 40px;
+  height: 40px;
+}
