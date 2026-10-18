@@ -190,6 +190,7 @@
               [daggersAnimationKey]="enemyDaggersAnimationKey(enemy)"
               [isSelectable]="isEnemySelectable(enemy)"
               [isSelected]="selectedEnemyInstanceIdSet().has(enemy.instanceId)"
+              [intentions]="enemyIntentions(enemy)"
               (characterClicked)="onEnemyClick(enemy)"
             />
           }

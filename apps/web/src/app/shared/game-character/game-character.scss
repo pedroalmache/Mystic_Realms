@@ -595,6 +595,30 @@
   z-index: 5;
 }
 
+.intentions-container {
+  position: absolute;
+  top: -44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 6px;
+  z-index: 6;
+  pointer-events: none;
+
+  .intention-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.85));
+  }
+
+  &--multi .intention-icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 .element-icon {
   width: 32px;
   height: 32px;

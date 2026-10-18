@@ -18,7 +18,7 @@ import {
   ELEMENT_ANIMATION_MS,
 } from '../../core/constants/animation.constants';
 import { Assets } from '../../core/constants/assets.constants';
-import { Spirit } from '../../core/services/single-player.service';
+import { EnemyIntentionType, Spirit } from '../../core/services/single-player.service';
 
 @Component({
   selector: 'app-game-character',
@@ -78,10 +78,28 @@ export class GameCharacterComponent {
   readonly water = input<boolean>(false);
   readonly earth = input<boolean>(false);
   readonly air = input<boolean>(false);
+  readonly intentions = input<EnemyIntentionType[]>([]);
 
   readonly characterClicked = output<void>();
 
   protected readonly Assets = Assets;
+
+  private readonly intentionIconMap: Record<EnemyIntentionType, string> = {
+    Attack: Assets.Images.Icons.IntentAttack,
+    Defense: Assets.Images.Icons.IntentDefense,
+    Special: Assets.Images.Icons.IntentSpecial,
+  };
+
+  protected readonly intentionIcons = computed(() =>
+    this.intentions()
+      .filter((intention): intention is EnemyIntentionType =>
+        intention === 'Attack' || intention === 'Defense' || intention === 'Special',
+      )
+      .map((intention) => ({
+        type: intention,
+        src: this.intentionIconMap[intention],
+      })),
+  );
   private readonly displayedMomentumCount = signal<number>(0);
   protected readonly isDaggersFadingOut = signal<boolean>(false);
   protected readonly isSpiritFadingOut = signal<boolean>(false);

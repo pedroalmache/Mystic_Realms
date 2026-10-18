@@ -75,6 +75,16 @@
       />
     }
   </div>
+  @if (intentionIcons().length > 0) {
+    <div
+      class="intentions-container"
+      [class.intentions-container--multi]="intentionIcons().length > 1"
+    >
+      @for (icon of intentionIcons(); track icon.type) {
+        <img class="intention-icon" [src]="icon.src" [alt]="icon.type" />
+      }
+    </div>
+  }
   @if (spirit() > 0 || isSpiritFadingOut()) {
     <div class="spirit-container" [class.fading]="isSpiritFadingOut()">
       <div class="spirit-circle">

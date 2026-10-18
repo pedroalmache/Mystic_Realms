@@ -216,6 +216,8 @@ export interface PartyMemberDto {
   air?: boolean | null;
 }
 
+export type EnemyIntentionType = 'Attack' | 'Defense' | 'Special';
+
 export interface EnemyDto {
   instanceId: string;
   id: number;
@@ -228,6 +230,7 @@ export interface EnemyDto {
   speed: number;
   poison?: number;
   daggers?: number;
+  intentions?: EnemyIntentionType[] | null;
 }
 
 export interface InitiativeDto {

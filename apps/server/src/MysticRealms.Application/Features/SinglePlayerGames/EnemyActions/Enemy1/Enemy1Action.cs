@@ -9,32 +9,90 @@ public class Enemy1Action : IEnemyAction
     private const int MinAmount = 5;
     private const int MaxAmount = 11;
 
-    public void Execute(EnemyDto enemy, SavedGameDto savedGame)
+    public EnemyPlannedAction Plan(EnemyDto enemy, SavedGameDto savedGame, Random rng)
     {
-        var roll = Random.Shared.Next(0, 100);
+        var roll = rng.Next(0, 100);
 
         if (roll < 35)
-            ExecuteAttack(enemy, savedGame);
-        else if (roll < 70)
-            ExecuteArmor(enemy, savedGame);
-        else
-            ExecuteHealing(enemy, savedGame);
+            return PlanAttack(savedGame, rng);
+
+        if (roll < 70)
+            return PlanArmor(rng);
+
+        return PlanHealing(savedGame, rng);
     }
 
-    private static void ExecuteAttack(EnemyDto enemy, SavedGameDto savedGame)
+    public void Execute(EnemyDto enemy, SavedGameDto savedGame, EnemyPlannedAction plan)
+    {
+        switch (plan.Kind)
+        {
+            case EnemyPlannedActionKind.PhysicalAttack:
+                ExecuteAttack(enemy, savedGame, plan);
+                break;
+            case EnemyPlannedActionKind.PhysicalArmor:
+                ExecuteArmor(enemy, savedGame, plan);
+                break;
+            case EnemyPlannedActionKind.Heal:
+                ExecuteHealing(savedGame, plan);
+                break;
+        }
+    }
+
+    private static EnemyPlannedAction PlanAttack(SavedGameDto savedGame, Random rng)
     {
         var aliveMembers = savedGame.PartyMembers.Where(pm => pm.Health > 0).ToList();
-        if (aliveMembers.Count == 0) return;
+        int? targetPartyMemberId = null;
+        if (aliveMembers.Count > 0)
+            targetPartyMemberId = aliveMembers[rng.Next(aliveMembers.Count)].PartyMemberId;
 
-        var target = aliveMembers[Random.Shared.Next(aliveMembers.Count)];
-        var damage = Random.Shared.Next(MinAmount, MaxAmount);
+        return new EnemyPlannedAction
+        {
+            Kind = EnemyPlannedActionKind.PhysicalAttack,
+            Amount = rng.Next(MinAmount, MaxAmount),
+            TargetPartyMemberId = targetPartyMemberId
+        };
+    }
+
+    private static EnemyPlannedAction PlanArmor(Random rng) =>
+        new()
+        {
+            Kind = EnemyPlannedActionKind.PhysicalArmor,
+            Amount = rng.Next(MinAmount, MaxAmount)
+        };
+
+    private static EnemyPlannedAction PlanHealing(SavedGameDto savedGame, Random rng)
+    {
+        var target = savedGame.Enemies
+            .Where(e => e.HitPoints > 0 && e.HitPoints < e.MaxHitPoints)
+            .OrderBy(e => e.HitPoints)
+            .FirstOrDefault();
+
+        if (target is null)
+            return PlanArmor(rng);
+
+        return new EnemyPlannedAction
+        {
+            Kind = EnemyPlannedActionKind.Heal,
+            Amount = rng.Next(MinAmount, MaxAmount),
+            TargetEnemyInstanceId = target.InstanceId
+        };
+    }
+
+    private static void ExecuteAttack(EnemyDto enemy, SavedGameDto savedGame, EnemyPlannedAction plan)
+    {
+        var target = plan.TargetPartyMemberId is int partyMemberId
+            ? savedGame.PartyMembers.FirstOrDefault(pm => pm.PartyMemberId == partyMemberId && pm.Health > 0)
+            : null;
+
+        target ??= savedGame.PartyMembers.FirstOrDefault(pm => pm.Health > 0);
+        if (target is null) return;
 
         savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(
             GameActionType.EnemyAttack,
             savedGame,
             enemies: new List<EnemyDto> { enemy }));
 
-        target.ApplyPhysicalDamage(damage);
+        target.ApplyPhysicalDamage(plan.Amount);
 
         savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(
             GameActionType.PhysicalDamage,
@@ -43,10 +101,9 @@ public class Enemy1Action : IEnemyAction
             enemies: new List<EnemyDto>()));
     }
 
-    private static void ExecuteArmor(EnemyDto enemy, SavedGameDto savedGame)
+    private static void ExecuteArmor(EnemyDto enemy, SavedGameDto savedGame, EnemyPlannedAction plan)
     {
-        var amount = Random.Shared.Next(MinAmount, MaxAmount);
-        enemy.ApplyArmor(amount);
+        enemy.ApplyArmor(plan.Amount);
 
         savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(
             GameActionType.EnemyArmor,
@@ -54,22 +111,25 @@ public class Enemy1Action : IEnemyAction
             enemies: new List<EnemyDto> { enemy }));
     }
 
-    private static void ExecuteHealing(EnemyDto enemy, SavedGameDto savedGame)
+    private static void ExecuteHealing(SavedGameDto savedGame, EnemyPlannedAction plan)
     {
-        var target = savedGame.Enemies
-            .Where(e => e.HitPoints > 0 && e.HitPoints < e.MaxHitPoints)
-            .OrderBy(e => e.HitPoints)
-            .FirstOrDefault();
+        var target = plan.TargetEnemyInstanceId is Guid instanceId
+            ? savedGame.Enemies.FirstOrDefault(e => e.InstanceId == instanceId && e.HitPoints > 0)
+            : null;
 
-        if (target is null)
+        if (target is null || target.HitPoints >= target.MaxHitPoints)
         {
-            // All enemies are at max HP — do armor instead
-            ExecuteArmor(enemy, savedGame);
-            return;
+            // Planned heal target is gone or full — fall back to armor on the acting enemy if present in log context.
+            // Caller executes heal for the planned target; if invalid, no-op (armor fallback already applied at plan time).
+            target = savedGame.Enemies
+                .Where(e => e.HitPoints > 0 && e.HitPoints < e.MaxHitPoints)
+                .OrderBy(e => e.HitPoints)
+                .FirstOrDefault();
+
+            if (target is null) return;
         }
 
-        var amount = Random.Shared.Next(MinAmount, MaxAmount);
-        target.Heal(amount);
+        target.Heal(plan.Amount);
 
         savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(
             GameActionType.EnemyHealing,

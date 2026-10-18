@@ -44,7 +44,8 @@ internal static class CombatTurnHelper
             pm.TotalMagicArmor, pm.Strength, pm.Defense, pm.Momentum, pm.Daggers, pm.Spirit, pm.Fire, pm.Water, pm.Earth, pm.Air);
 
     private static EnemyRecord ToRecord(EnemyDto e) =>
-        new(e.InstanceId, e.Id, e.Name, e.HitPoints, e.MaxHitPoints, e.Speed, e.TotalArmor, e.TotalMagicArmor, e.TotalPoison);
+        new(e.InstanceId, e.Id, e.Name, e.HitPoints, e.MaxHitPoints, e.Speed, e.TotalArmor, e.TotalMagicArmor, e.TotalPoison,
+            e.PlannedAction?.Intentions);
 
     internal static CardRecord ToRecord(CardDto c) =>
         new(c.Id, c.PlayerId, c.CardId, c.InstanceId, c.PartyMemberId, c.Color, c.Name,

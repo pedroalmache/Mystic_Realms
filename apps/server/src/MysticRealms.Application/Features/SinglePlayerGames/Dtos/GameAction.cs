@@ -47,7 +47,8 @@ public record EnemyRecord(
     int Speed,
     int Armor,
     int MagicArmor,
-    int Poison);
+    int Poison,
+    IReadOnlyList<EnemyIntentionType>? Intentions = null);
 
 public record CardRecord(
     int Id,

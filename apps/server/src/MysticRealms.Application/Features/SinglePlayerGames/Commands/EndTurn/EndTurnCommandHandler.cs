@@ -24,8 +24,7 @@ public class EndTurnCommandHandler(IGameRepository gameRepository) : IRequestHan
         
         if (savedGame.Initiatives.Count == 0)
         {
-            savedGame.Turn++;
-            savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateTurn, savedGame, savedGame.Turn));
+            IncrementTurnAndPlan(savedGame);
         }
 
         savedGame.Initiatives = CombatTurnHelper.GetInitiative(savedGame);
@@ -33,8 +32,7 @@ public class EndTurnCommandHandler(IGameRepository gameRepository) : IRequestHan
 
         if (savedGame.Initiatives.Count == 0)
         {
-            savedGame.Turn++;
-            savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateTurn, savedGame, savedGame.Turn));
+            IncrementTurnAndPlan(savedGame);
             savedGame.Initiatives = CombatTurnHelper.GetInitiative(savedGame);
             savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateInitiative, savedGame));
         }
@@ -64,8 +62,7 @@ public class EndTurnCommandHandler(IGameRepository gameRepository) : IRequestHan
 
                         if (savedGame.Initiatives.Count == 0)
                         {
-                            savedGame.Turn++;
-                            savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateTurn, savedGame, savedGame.Turn));
+                            IncrementTurnAndPlan(savedGame);
                             savedGame.Initiatives = CombatTurnHelper.GetInitiative(savedGame);
                             savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateInitiative, savedGame));
                         }
@@ -81,7 +78,9 @@ public class EndTurnCommandHandler(IGameRepository gameRepository) : IRequestHan
                         .ToList();
 
                     var enemyAction = EnemyActionFactory.GetAction(actingEnemy.Id);
-                    enemyAction.Execute(actingEnemy, savedGame);
+                    var plan = EnemyActionPlanner.EnsurePlan(actingEnemy, savedGame);
+                    enemyAction.Execute(actingEnemy, savedGame, plan);
+                    actingEnemy.PlannedAction = null;
 
                     var newlyDeadPartyMembers = savedGame.PartyMembers
                         .Where(pm => pm.Health <= 0 && alivePartyMembersBefore.Contains(pm.PartyMemberId))
@@ -111,8 +110,7 @@ public class EndTurnCommandHandler(IGameRepository gameRepository) : IRequestHan
 
                     if (savedGame.Initiatives.Count == 0)
                     {
-                        savedGame.Turn++;
-                        savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateTurn, savedGame, savedGame.Turn));
+                        IncrementTurnAndPlan(savedGame);
                         savedGame.Initiatives = CombatTurnHelper.GetInitiative(savedGame);
                         savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateInitiative, savedGame));
                     }
@@ -143,8 +141,7 @@ public class EndTurnCommandHandler(IGameRepository gameRepository) : IRequestHan
 
                         if (savedGame.Initiatives.Count == 0)
                         {
-                            savedGame.Turn++;
-                            savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateTurn, savedGame, savedGame.Turn));
+                            IncrementTurnAndPlan(savedGame);
                             savedGame.Initiatives = CombatTurnHelper.GetInitiative(savedGame);
                             savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateInitiative, savedGame));
                         }
@@ -193,5 +190,12 @@ public class EndTurnCommandHandler(IGameRepository gameRepository) : IRequestHan
         await gameRepository.UpdateAsync(game, cancellationToken);
 
         return savedGame.ActionLog;
+    }
+
+    private static void IncrementTurnAndPlan(SavedGameDto savedGame)
+    {
+        savedGame.Turn++;
+        EnemyActionPlanner.PlanForTurn(savedGame);
+        savedGame.ActionLog.Add(CombatTurnHelper.BuildAction(GameActionType.UpdateTurn, savedGame, savedGame.Turn));
     }
 }

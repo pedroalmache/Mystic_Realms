@@ -2021,6 +2021,13 @@ export class EncounterComponent {
     this.roomWon.emit();
   }
 
+  protected enemyIntentions(enemy: EnemyDto): NonNullable<EnemyDto['intentions']> {
+    if (this.isEnemyDead(enemy)) {
+      return [];
+    }
+    return enemy.intentions ?? [];
+  }
+
   private isEnemyDead(enemy: EnemyDto): boolean {
     return enemy.hitPoints <= 0;
   }
@@ -2045,6 +2052,10 @@ export class EncounterComponent {
   }
 
   private async processUpdateTurn(action: GameAction): Promise<void> {
+    if (action.enemies) {
+      this.displayEnemies.set(this.mergeEnemies(action.enemies));
+    }
+
     const newTurn = action.turn ?? 0;
     // Kick off the grow + wobble animation with the old number still showing.
     this.turnAnimating.set(true);
@@ -2059,6 +2070,10 @@ export class EncounterComponent {
   }
 
   private async processUpdateInitiative(action: GameAction): Promise<void> {
+    if (action.enemies) {
+      this.displayEnemies.set(this.mergeEnemies(action.enemies));
+    }
+
     const newEntries = action.initiative ?? [];
     const newKeySet = new Set(newEntries.map(initiativeEntryKey));
     const currentEntries = this.initiativeEntries();

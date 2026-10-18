@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using MysticRealms.Domain.Dungeons;
 using MysticRealms.Domain.Enums;
+using MysticRealms.Application.Features.SinglePlayerGames.EnemyActions;
 
 namespace MysticRealms.Application.Features.SinglePlayerGames.Dtos;
 
@@ -131,6 +132,7 @@ public class EnemyDto
     public int TotalPoison => Poison.Sum(e => e.Amount);
     public List<EffectEntry> MagicArmor { get; set; } = new();
     public int TotalMagicArmor => MagicArmor.Sum(e => e.Amount);
+    public EnemyPlannedAction? PlannedAction { get; set; }
 
     /// <summary>
     /// Applies physical damage to this enemy, consuming armor entries from oldest to newest
